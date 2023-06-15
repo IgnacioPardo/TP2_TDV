@@ -2,11 +2,9 @@
 #define GAP_INSTANCE_H
 
 #include<vector>
-#include<tuple>
 #include<string>
 #include<fstream>
 #include<iostream>
-#include<sstream>
 
 /*
 
@@ -63,4 +61,4 @@ class GapInstance {
         void _read(std::string filename);
 };
 
-#endif
+#endif // GAP_INSTANCE_H

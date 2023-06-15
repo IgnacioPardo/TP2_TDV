@@ -11,5 +11,8 @@ int main(int argc, char** argv) {
 
     GapInstance instance(filename);
 
+    std::cout << "n: " << instance.n() << std::endl;
+    std::cout << "m: " << instance.m() << std::endl;
+
     return 0;
 }
