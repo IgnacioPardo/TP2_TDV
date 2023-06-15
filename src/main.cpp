@@ -2,6 +2,8 @@
 #include <iostream>
 
 #include "gap_instance.h"
+#include "greedy.h"
+
 
 int main(int argc, char** argv) {
     std::string filename = "instances/gap/gap_a/a05100";
@@ -13,6 +15,10 @@ int main(int argc, char** argv) {
 
     std::cout << "n: " << instance.n() << std::endl;
     std::cout << "m: " << instance.m() << std::endl;
+
+    Greedy greedy(instance);
+
+    greedy.solve();
 
     return 0;
 }

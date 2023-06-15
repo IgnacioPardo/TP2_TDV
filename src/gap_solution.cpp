@@ -69,3 +69,24 @@ void GapSolution::set_cost(int cost) {
     // Set costo total de la solución
     this->_cost = cost;
 }
+
+std::ostream& operator<<(std::ostream& os, const GapSolution& solution){
+
+    os << "n: " << solution.n() << std::endl;
+    os << "m: " << solution.m() << std::endl;
+    os << "cost: " << solution.cost() << std::endl;
+
+    for (int i = 0; i < solution.n(); i++) {
+        os << "vendedor " << i << " -> deposito " << solution.deposito_asignado_al_vendedor(i) << std::endl;
+    }
+
+    for (int i = 0; i < solution.m(); i++) {
+        os << "deposito " << i << " -> ";
+        for (int j : solution.vendedores_asignados_al_deposito(i)) {
+            os << j << " ";
+        }
+        os << std::endl;
+    }
+
+    return os;
+}
