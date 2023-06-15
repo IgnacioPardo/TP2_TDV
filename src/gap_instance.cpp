@@ -48,10 +48,7 @@ void GapInstance::_read(std::string filename){
 
     std::ifstream input_file(filename);
 
-    input_file >> this->_n >> this->_m;
-
-    std::cout << "n: " << this->_n << std::endl;
-    std::cout << "m: " << this->_m << std::endl;
+    input_file >> this->_m >> this->_n;
 
     this->_cost = std::vector<std::vector<int>>(this->_m, std::vector<int>(this->_n, 0));
     this->_d = std::vector<std::vector<int>>(this->_m, std::vector<int>(this->_n, 0));
