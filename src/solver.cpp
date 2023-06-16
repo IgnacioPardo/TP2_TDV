@@ -40,3 +40,12 @@ int Solver::get_cost() const {
 GapSolution Solver::get_solution() const {
     return this->_solution;
 }
+
+
+int Solver::get_capacidad_deposito(int i) {
+    int capacidad = this->_instance.capacidad(i);
+    for (int j : this->_solution.vendedores_asignados_al_deposito(i)) {
+        capacidad -= this->_instance.demanda(i, j);
+    }
+    return capacidad;
+}

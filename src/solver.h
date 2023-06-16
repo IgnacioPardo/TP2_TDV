@@ -23,6 +23,8 @@ class Solver {
         // Set Instance
         void set_instance(GapInstance instance);
 
+        int get_capacidad_deposito(int i);
+
     protected:
         // Instance
         GapInstance _instance;

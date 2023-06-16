@@ -30,6 +30,9 @@ class GapSolution {
         // Costo total de la solución
         int cost() const;
 
+        // Tiempo en resolver el problema
+        double time() const;
+
         // Setters
 
         // Asignación del vendedor j al depósito i
@@ -43,6 +46,9 @@ class GapSolution {
 
         // Set costo total de la solución
         void set_cost(int cost);
+
+        // Set tiempo en resolver el problema
+        void set_time(double time);
 
         friend std::ostream& operator<<(std::ostream& os, const GapSolution& solution);
 
@@ -62,6 +68,8 @@ class GapSolution {
         // Asignación de vendedores a depósitos
         std::vector<std::set<int>> _vendedores_asignados_a_deposito;
         
+        // Tiempo en resolver el problema
+        double _time;
 };
 
 #endif // GAP_SOLUTION_H

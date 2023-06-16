@@ -34,10 +34,10 @@ class GapInstance {
         int m() const;
 
         // Capacidad del depósito i
-        int c(int i) const;
+        int capacidad(int i) const;
 
         // Demanda del vendedor j para el depósito i
-        int d(int i, int j) const;
+        int demanda(int i, int j) const;
 
         // Costo de asignar el vendedor j al depósito i
         int cost(int i, int j) const;

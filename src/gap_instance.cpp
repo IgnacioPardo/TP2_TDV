@@ -21,12 +21,12 @@ int GapInstance::m() const {
     return this->_m;
 }
 
-int GapInstance::c(int i) const {
+int GapInstance::capacidad(int i) const {
     // Capacidad del depósito i
     return this->_c[i];
 }
 
-int GapInstance::d(int i, int j) const {
+int GapInstance::demanda(int i, int j) const {
     // Demanda del vendedor j para el depósito i
     return this->_d[i][j];
 }
