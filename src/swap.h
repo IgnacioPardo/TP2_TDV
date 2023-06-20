@@ -12,6 +12,7 @@ class Swap : public Solver {
         ~Swap();
 
         void solve();
+        void solve(GapSolution solution);
         void perform_swap(int tries);
     
     private:

@@ -14,10 +14,10 @@ void GreedyMinCost::solve(){
         //std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
 
         if (deposito == -1) {
-            int demanda_maxima_vj = 0;
+            double demanda_maxima_vj = 0;
 
             for (int i = 0; i < this->_instance.m(); i++){
-                int c_dem = this->_instance.demanda(i, j);
+                double c_dem = this->_instance.demanda(i, j);
                 if (c_dem > demanda_maxima_vj){
                     demanda_maxima_vj = c_dem;
                 }
@@ -45,8 +45,8 @@ int GreedyMinCost::get_mejor_deposito(int j) {
     // Capacidad del deposito i - capacidad de los vendedores asignados a i >= demanda del vendedor j al deposito i
 
     for (int deposito = 0; deposito < this->_instance.m(); deposito++) {
-        int capacidad_deposito = this->get_capacidad_deposito(deposito);
-        int demanda = this->_instance.demanda(deposito, j);
+        double capacidad_deposito = this->get_capacidad_deposito(deposito);
+        double demanda = this->_instance.demanda(deposito, j);
         if (capacidad_deposito >= demanda) {
             mejor_deposito = deposito;
             mejor_costo = this->_instance.cost(deposito, j);
@@ -58,8 +58,8 @@ int GreedyMinCost::get_mejor_deposito(int j) {
     // Capacidad del deposito i - capacidad de los vendedores asignados a i >= demanda del vendedor j al deposito i
 
     for (int deposito = 0; deposito < this->_instance.m(); deposito++) {
-        int capacidad_deposito = this->get_capacidad_deposito(deposito);
-        int demanda = this->_instance.demanda(deposito, j);
+        double capacidad_deposito = this->get_capacidad_deposito(deposito);
+        double demanda = this->_instance.demanda(deposito, j);
 
         if (capacidad_deposito >= demanda && this->_instance.cost(deposito, j) < mejor_costo) {
             mejor_deposito = deposito;

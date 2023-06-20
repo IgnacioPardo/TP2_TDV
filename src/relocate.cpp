@@ -8,18 +8,38 @@ Relocate::~Relocate() {}
 
 void Relocate::solve()
 {
-
     auto start = std::chrono::steady_clock::now();
 
-    BinPacking binpacking(this->_instance);
-    binpacking.solve();
-    GapSolution solution = binpacking.get_solution();
+    GreedyMinCost greedy(this->_instance);
+    greedy.solve();
+    GapSolution solution = greedy.get_solution();
 
     this->_solution = solution;
     for (int i = 0; i < 10; i++)
     {
         this->perform_relocation(1000);
     }
+
+    auto end = std::chrono::steady_clock::now();
+    this->_solution_time = std::chrono::duration<double, std::milli>(end - start).count();
+
+    this->_solution.set_time(this->_solution_time);
+}
+
+void Relocate::solve(GapSolution solution)
+{
+    auto start = std::chrono::steady_clock::now();
+
+    this->_solution = solution;
+    for (int i = 0; i < 10; i++)
+    {
+        this->perform_relocation(1000);
+    }
+
+    auto end = std::chrono::steady_clock::now();
+    this->_solution_time = std::chrono::duration<double, std::milli>(end - start).count();
+
+    this->_solution.set_time(this->_solution_time);
 }
 
 void Relocate::perform_relocation(int tries = 10)

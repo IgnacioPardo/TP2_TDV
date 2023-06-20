@@ -34,13 +34,13 @@ class GapInstance {
         int m() const;
 
         // Capacidad del depósito i
-        int capacidad(int i) const;
+        double capacidad(int i) const;
 
         // Demanda del vendedor j para el depósito i
-        int demanda(int i, int j) const;
+        double demanda(int i, int j) const;
 
         // Costo de asignar el vendedor j al depósito i
-        int cost(int i, int j) const;
+        double cost(int i, int j) const;
 
     private:
         // Cantidad de vendedores
@@ -50,13 +50,13 @@ class GapInstance {
         int _m;
 
         // Capacidad del depósito i
-        std::vector<int> _c;
+        std::vector<double> _c;
 
         // Demanda del vendedor j para el depósito i
-        std::vector<std::vector<int>> _d;
+        std::vector<std::vector<double>> _d;
 
         // Costo de asignar el vendedor j al depósito i
-        std::vector<std::vector<int>> _cost;
+        std::vector<std::vector<double>> _cost;
 
         void _read(std::string filename);
 };

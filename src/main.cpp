@@ -12,7 +12,10 @@
 
 int main(int argc, char** argv) {
     // std::string filename = "instances/gap/gap_a/a05100";
-    std::string filename = "instances/gap/gap_b/b05100";
+    // std::string filename = "instances/gap/gap_b/b05100";
+    // std::string filename = "instances/gap/gap_e/e801600";
+    std::string filename = "instances/real/real_instance";
+
     std::cout << "Reading file " << filename << std::endl;
 
     // Aca empieza la magia 🪄
@@ -22,9 +25,9 @@ int main(int argc, char** argv) {
     std::cout << "Vendedores: " << instance.n() << std::endl;
     std::cout << "Depósitos: " << instance.m() << std::endl;
 
-    for (int i = 0; i < instance.m(); i++) {
-        std::cout << "capacidad " << i << ": " << instance.capacidad(i) << std::endl;
-    }
+    // for (int i = 0; i < instance.m(); i++) {
+    //     std::cout << "capacidad " << i << ": " << instance.capacidad(i) << std::endl;
+    // }
 
     // --------------------------------- GREEDY SOLUTION ---------------------------------------
 
@@ -67,6 +70,26 @@ int main(int argc, char** argv) {
     GapSolution relocate_solution = relocate.get_solution();
 
     std::cout << "After Relocate solution cost: " << relocate_solution.cost() << std::endl;
+
+    // --------------------------------  RELOCATE SWAP LOCAL SOLUTION ------------------------------------------
+
+    Relocate relocate_swap(instance);
+
+    relocate_swap.solve(swap_solution);
+
+    GapSolution relocate_swap_solution = relocate_swap.get_solution();
+
+    std::cout << "After Relocate Swap solution cost: " << relocate_swap_solution.cost() << std::endl;
+
+    // --------------------------------  SWAP RELOCATE LOCAL SOLUTION ------------------------------------------
+
+    Swap swap_relocate(instance);
+
+    swap_relocate.solve(relocate_solution);
+
+    GapSolution swap_relocate_solution = swap_relocate.get_solution();
+
+    std::cout << "After Swap Relocate solution cost: " << swap_relocate_solution.cost() << std::endl;
 
     return 0;
 }

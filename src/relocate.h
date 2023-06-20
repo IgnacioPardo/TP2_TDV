@@ -12,6 +12,7 @@ class Relocate : public Solver {
         ~Relocate();
 
         void solve();
+        void solve(GapSolution solution);
         void perform_relocation(int tries);
     
     private:

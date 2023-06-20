@@ -33,7 +33,8 @@ void Solver::set_instance(GapInstance instance) {
     this->_solution.set_m(instance.m());
 }
 
-int Solver::get_cost() const {
+double Solver::get_cost() const
+{
     return this->_cost;
 }
 
@@ -41,9 +42,8 @@ GapSolution Solver::get_solution() const {
     return this->_solution;
 }
 
-
-int Solver::get_capacidad_deposito(int i) {
-    int capacidad = this->_instance.capacidad(i);
+double Solver::get_capacidad_deposito(int i) {
+    double capacidad = this->_instance.capacidad(i);
     for (int j : this->_solution.vendedores_asignados_al_deposito(i)) {
         capacidad -= this->_instance.demanda(i, j);
     }

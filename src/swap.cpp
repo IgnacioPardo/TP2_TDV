@@ -9,13 +9,24 @@ Swap::~Swap() {}
 void Swap::solve() {
     auto start = std::chrono::steady_clock::now();
 
-    // GreedyMinCost greedy(this->_instance);
-    // greedy.solve();
-    // GapSolution solution = greedy.get_solution();
+    GreedyMinCost greedy(this->_instance);
+    greedy.solve();
+    GapSolution solution = greedy.get_solution();
 
-    BinPacking binpacking(this->_instance);
-    binpacking.solve();
-    GapSolution solution = binpacking.get_solution();
+    this->_solution = solution;
+    
+    for (int i = 0; i < 10; i++){
+        this->perform_swap(1000);
+    }
+
+    auto end = std::chrono::steady_clock::now();
+    this->_solution_time = std::chrono::duration<double, std::milli>(end - start).count();
+
+    this->_solution.set_time(this->_solution_time);
+}
+
+void Swap::solve(GapSolution solution) {
+    auto start = std::chrono::steady_clock::now();
 
     this->_solution = solution;
     
@@ -59,8 +70,8 @@ void Swap::perform_swap(int tries = 10){
         }
     
         // Calculamos el espacio disponible en cada deposito para los vendedores en el caso de intercambiarlos
-        int room_in_deposit_i = this->get_capacidad_deposito(d_i) + this->_instance.demanda(d_i, v_i);
-        int room_in_deposit_j = this->get_capacidad_deposito(d_j) + this->_instance.demanda(d_j, v_j);
+        double room_in_deposit_i = this->get_capacidad_deposito(d_i) + this->_instance.demanda(d_i, v_i);
+        double room_in_deposit_j = this->get_capacidad_deposito(d_j) + this->_instance.demanda(d_j, v_j);
 
         // Si ambos depositos tienen espacio para los vendedores
         if (room_in_deposit_i >= this->_instance.demanda(d_i, v_j) && room_in_deposit_j >= this->_instance.demanda(d_j, v_i)) {

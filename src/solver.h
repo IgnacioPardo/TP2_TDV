@@ -18,12 +18,12 @@ class Solver {
         GapSolution get_solution() const;
 
         // Get Cost
-        int get_cost() const;
+        double get_cost() const;
 
         // Set Instance
         void set_instance(GapInstance instance);
 
-        int get_capacidad_deposito(int i);
+        double get_capacidad_deposito(int i);
 
     protected:
         // Instance
@@ -35,7 +35,7 @@ class Solver {
         int _status;
 
         // Cost
-        int _cost;
+        double _cost;
 
         // Solution Time
         double _solution_time;

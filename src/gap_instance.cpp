@@ -21,17 +21,20 @@ int GapInstance::m() const {
     return this->_m;
 }
 
-int GapInstance::capacidad(int i) const {
+double GapInstance::capacidad(int i) const
+{
     // Capacidad del depósito i
     return this->_c[i];
 }
 
-int GapInstance::demanda(int i, int j) const {
+double GapInstance::demanda(int i, int j) const
+{
     // Demanda del vendedor j para el depósito i
     return this->_d[i][j];
 }
 
-int GapInstance::cost(int i, int j) const {
+double GapInstance::cost(int i, int j) const
+{
     // Costo de asignar el vendedor j al depósito i
     return this->_cost[i][j];
 }
@@ -50,9 +53,9 @@ void GapInstance::_read(std::string filename){
 
     input_file >> this->_m >> this->_n;
 
-    this->_cost = std::vector<std::vector<int>>(this->_m, std::vector<int>(this->_n, 0));
-    this->_d = std::vector<std::vector<int>>(this->_m, std::vector<int>(this->_n, 0));
-    this->_c = std::vector<int>(this->_m, 0);
+    this->_cost = std::vector<std::vector<double>>(this->_m, std::vector<double>(this->_n, 0));
+    this->_d = std::vector<std::vector<double>>(this->_m, std::vector<double>(this->_n, 0));
+    this->_c = std::vector<double>(this->_m, 0);
 
     // Fill _cost matrix
     // The matrix is _m x _n
