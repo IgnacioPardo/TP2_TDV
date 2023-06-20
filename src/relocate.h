@@ -12,6 +12,7 @@ class Relocate : public Solver {
         ~Relocate();
 
         void solve();
+        int perform_relocation(GapSolution &solution, int tries);
     
     private:
         int get_mejor_deposito(int j);

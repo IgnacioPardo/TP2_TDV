@@ -19,8 +19,8 @@ int main(int argc, char** argv) {
 
     GapInstance instance(filename);
 
-    std::cout << "n: " << instance.n() << std::endl;
-    std::cout << "m: " << instance.m() << std::endl;
+    std::cout << "Vendedores: " << instance.n() << std::endl;
+    std::cout << "Depósitos: " << instance.m() << std::endl;
 
     // for (int i = 0; i < instance.m(); i++) {
     //     std::cout << "capacidad " << i << ": " << instance.capacidad(i) << std::endl;
@@ -34,9 +34,8 @@ int main(int argc, char** argv) {
 
     GapSolution greedy_solution = greedy.get_solution();
 
-    std::cout << greedy_solution.cost() << std::endl;
+    std::cout << "Greedy solution cost: " << greedy_solution.cost() << std::endl;
 
-    
     
     // ------------------------------ BINPACKING SOLUTION--------------------------------------
     
@@ -46,7 +45,7 @@ int main(int argc, char** argv) {
 
     // GapSolution binpacking_solution = binpacking.get_solution();
 
-    // std::cout << binpacking_solution << std::endl;
+    // std::cout << "Bin Packing solution cost: " << binpacking_solution << std::endl;
 
 
     // --------------------------------  SWAP LOCAL SOLUTION ------------------------------------------
@@ -57,17 +56,17 @@ int main(int argc, char** argv) {
 
     GapSolution swap_solution = swap.get_solution();
 
-    std::cout << swap_solution.cost() << std::endl;
+    std::cout << "After Swap solution cost: " << swap_solution.cost() << std::endl;
 
     // --------------------------------  RELOCATE LOCAL SOLUTION ------------------------------------------
 
-    // Relocate relocate(instance);
+    Relocate relocate(instance);
 
-    // relocate.solve();
+    relocate.solve();
 
-    // GapSolution relocate_solution = relocate.get_solution();
+    GapSolution relocate_solution = relocate.get_solution();
 
-    // std::cout << relocate_solution.cost() << std::endl;
+    std::cout << "After Relocate solution cost: " << relocate_solution.cost() << std::endl;
 
     return 0;
 }

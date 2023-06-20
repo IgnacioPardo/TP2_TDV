@@ -15,9 +15,8 @@ void Swap::solve() {
 
     int new_cost;
     
-    for (int i = 0; i < 1000; i++){
-        //std::cout << "Swap n:" << i << std::endl;
-        new_cost = this->perform_swap(solution, 10000);
+    for (int i = 0; i < 10; i++){
+        new_cost = this->perform_swap(solution, 10);
     }
     
     this->_solution = solution;
@@ -36,12 +35,11 @@ int Swap::perform_swap(GapSolution &solution, int tries = 10){
 
     while (partial_cost == solution.cost() && tries > 0){
 
-        // std::cout << "Tries left: " << tries << std::endl;
-
         int v_i;
         int v_j;
         int d_j = -1;
         int d_i = -1;
+        
         
         while (d_i == -1 || d_j == -1){
 
@@ -49,27 +47,32 @@ int Swap::perform_swap(GapSolution &solution, int tries = 10){
             std::mt19937 rng(rd());   
             std::uniform_int_distribution<int> uni(0,solution.n()); 
 
+            // Tomamos dos vendedores al azar
             v_i = uni(rng) % solution.n();
             v_j = uni(rng) % solution.n();
 
+            // Obtenemos los depositos asignados a cada vendedor
             d_j = solution.deposito_asignado_al_vendedor(v_j);
             d_i = solution.deposito_asignado_al_vendedor(v_i);
         }
-
-        // std::cout << "Vendedor 1: " << v_i << ", Deposito 1: " << d_i << std::endl;
-        // std::cout << "Vendedor 2: " << v_j << ", Deposito 2: " << d_j << std::endl;
     
+        // Calculamos el espacio disponible en cada deposito para los vendedores en el caso de intercambiarlos
         int room_in_deposit_i = this->get_capacidad_deposito(d_i) + this->_instance.demanda(d_i, v_i);
         int room_in_deposit_j = this->get_capacidad_deposito(d_j) + this->_instance.demanda(d_j, v_j);
 
-
+        // Si ambos depositos tienen espacio para los vendedores
         if (room_in_deposit_i >= this->_instance.demanda(d_i, v_j) && room_in_deposit_j >= this->_instance.demanda(d_j, v_i)) {
             
+            // Calculamos el nuevo costo de intercambiar los vendedores
             double new_cost = partial_cost + this->_instance.cost(d_i, v_j) + this->_instance.cost(d_j, v_i) - this->_instance.cost(d_i, v_i) - this->_instance.cost(d_j, v_j);
 
+            // Si el nuevo costo es menor al costo parcial
             if (new_cost < partial_cost) {
+                
+                // Actualizamos el costo parcial
                 partial_cost = new_cost;
 
+                // Intercambiamos los depositos de los vendedores
                 solution.desasignar_deposito_de_vendedor(d_i, v_i);
                 solution.desasignar_deposito_de_vendedor(d_j, v_j);
 
