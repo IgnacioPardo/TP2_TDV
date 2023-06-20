@@ -1,20 +1,21 @@
-#ifndef TWOOPT_H
-#define TWOOPT_H
+#ifndef SWAP_H
+#define SWAP_H
 
 #include "solver.h"
 
 #include "gap_solution.h"
 #include "gap_instance.h"
 
-class Two_opt : public Solver {
+class Swap : public Solver {
     public:
         using Solver::Solver;   
-        ~Two_opt();
+        ~Swap();
 
         void solve();
+        int perform_swap(GapSolution &solution, int tries);
     
     private:
         int get_mejor_deposito(int j);
 };
 
-#endif // TWOOPT_H
+#endif // SWAP_H

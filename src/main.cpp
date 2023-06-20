@@ -2,13 +2,17 @@
 #include <iostream>
 
 #include "gap_instance.h"
+#include "gap_solution.h"
 
 #include "greedy_mincost.h"
 #include "binpacking.h"
+#include "swap.h"
+#include "relocate.h"
+
 
 int main(int argc, char** argv) {
-    //std::string filename = "instances/gap/gap_b/b05100";
-    std::string filename = "instances/gap/gap_a/a05100";
+    // std::string filename = "instances/gap/gap_a/a05100";
+    std::string filename = "instances/gap/gap_b/b05100";
     std::cout << "Reading file " << filename << std::endl;
 
     // Aca empieza la magia 🪄
@@ -22,21 +26,48 @@ int main(int argc, char** argv) {
     //     std::cout << "capacidad " << i << ": " << instance.capacidad(i) << std::endl;
     // }
 
-    // GreedyMinCost greedy(instance);
+    // --------------------------------- GREEDY SOLUTION ---------------------------------------
 
-    // greedy.solve();
+    GreedyMinCost greedy(instance);
 
-    // GapSolution solution = greedy.get_solution();
+    greedy.solve();
 
-    // std::cout << solution << std::endl;
+    GapSolution greedy_solution = greedy.get_solution();
 
-    BinPacking binpacking(instance);
+    std::cout << greedy_solution.cost() << std::endl;
 
-    binpacking.solve();
+    
+    
+    // ------------------------------ BINPACKING SOLUTION--------------------------------------
+    
+    // BinPacking binpacking(instance);
 
-    GapSolution solution = binpacking.get_solution();
+    // binpacking.solve();
 
-    std::cout << solution << std::endl;
+    // GapSolution binpacking_solution = binpacking.get_solution();
+
+    // std::cout << binpacking_solution << std::endl;
+
+
+    // --------------------------------  SWAP LOCAL SOLUTION ------------------------------------------
+
+    Swap swap(instance);
+
+    swap.solve();
+
+    GapSolution swap_solution = swap.get_solution();
+
+    std::cout << swap_solution.cost() << std::endl;
+
+    // --------------------------------  RELOCATE LOCAL SOLUTION ------------------------------------------
+
+    // Relocate relocate(instance);
+
+    // relocate.solve();
+
+    // GapSolution relocate_solution = relocate.get_solution();
+
+    // std::cout << relocate_solution.cost() << std::endl;
 
     return 0;
 }

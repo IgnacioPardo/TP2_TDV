@@ -17,14 +17,20 @@ void BinPacking::solve(){
         std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
 
         if (deposito == -1) {
-            std::cout << "No se encontro deposito para el vendedor " << j << std::endl;
-            this->_status = 0;
-            break;
+            int demanda_maxima_vj = 0;
+
+            for (int i = 0; i < this->_instance.m(); i++){
+                int c_dem = this->_instance.demanda(i, j);
+                if (c_dem > demanda_maxima_vj){
+                    demanda_maxima_vj = c_dem;
+                }
+            }
+            this->_cost += 3 * demanda_maxima_vj;
         }
-
-        this->_solution.asignar_deposito_a_vendedor(deposito, j);
-
-        this->_cost += this->_instance.cost(deposito, j);
+        else{
+            this->_solution.asignar_deposito_a_vendedor(deposito, j);
+            this->_cost += this->_instance.cost(deposito, j);
+        }
     }
 
     this->_solution.set_cost(this->_cost);

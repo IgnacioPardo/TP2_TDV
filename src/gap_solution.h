@@ -28,7 +28,7 @@ class GapSolution {
         std::vector<int> vendedores_asignados_al_deposito(int i) const;
 
         // Costo total de la solución
-        int cost() const;
+        double cost() const;
 
         // Tiempo en resolver el problema
         double time() const;
@@ -37,6 +37,9 @@ class GapSolution {
 
         // Asignación del vendedor j al depósito i
         void asignar_deposito_a_vendedor(int i, int j);
+
+        // Desasignación del vendedor j del depósito i
+        void desasignar_deposito_de_vendedor(int i, int j);
 
         // Set cantidad de vendedores
         void set_n(int n);
@@ -60,7 +63,7 @@ class GapSolution {
         int _m;
 
         // Costo total de la solución
-        int _cost;
+        double _cost;
 
         // Deposito asignado al vendedor j
         std::vector<int> _deposito_asignado_a_vendedor;

@@ -43,7 +43,7 @@ std::vector<int> GapSolution::vendedores_asignados_al_deposito(int i) const {
     return vendedores_asignados;
 }
 
-int GapSolution::cost() const {
+double GapSolution::cost() const {
     // Costo total de la solución
     return this->_cost;
 }
@@ -55,6 +55,15 @@ void GapSolution::asignar_deposito_a_vendedor(int i, int j) {
     this->_vendedores_asignados_a_deposito[i].insert(j);
 
 }
+
+void GapSolution::desasignar_deposito_de_vendedor(int i, int j) {
+    // Desasignación del vendedor j del depósito i
+    
+    this->_deposito_asignado_a_vendedor[j] = -1;
+    this->_vendedores_asignados_a_deposito[i].erase(j);
+    
+}
+
 
 void GapSolution::set_n(int n) {
     // Set cantidad de vendedores

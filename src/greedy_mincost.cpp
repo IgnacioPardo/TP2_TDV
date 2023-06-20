@@ -11,21 +11,26 @@ void GreedyMinCost::solve(){
     for (int j = 0; j < this->_instance.n(); j++) {
         int deposito = this->get_mejor_deposito(j);
         
-        std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
+        //std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
 
         if (deposito == -1) {
-            std::cout << "No se encontro deposito para el vendedor " << j << std::endl;
-            this->_status = 0;
-            break;
+            int demanda_maxima_vj = 0;
+
+            for (int i = 0; i < this->_instance.m(); i++){
+                int c_dem = this->_instance.demanda(i, j);
+                if (c_dem > demanda_maxima_vj){
+                    demanda_maxima_vj = c_dem;
+                }
+            }
+            this->_cost += 3 * demanda_maxima_vj;
         }
-
-        this->_solution.asignar_deposito_a_vendedor(deposito, j);
-
-        this->_cost += this->_instance.cost(deposito, j);
+        else{
+            this->_solution.asignar_deposito_a_vendedor(deposito, j);
+            this->_cost += this->_instance.cost(deposito, j);
+        }
     }
 
     this->_solution.set_cost(this->_cost);
-
     auto end = std::chrono::steady_clock::now();
     this->_solution_time = std::chrono::duration<double, std::milli>(end - start).count();
 
@@ -55,11 +60,6 @@ int GreedyMinCost::get_mejor_deposito(int j) {
     for (int deposito = 0; deposito < this->_instance.m(); deposito++) {
         int capacidad_deposito = this->get_capacidad_deposito(deposito);
         int demanda = this->_instance.demanda(deposito, j);
-
-        if (j == 72){
-            std::cout << "!!! ";
-            std::cout << "deposito " << deposito << " capacidad " << capacidad_deposito << " demanda " << demanda << std::endl;
-        }
 
         if (capacidad_deposito >= demanda && this->_instance.cost(deposito, j) < mejor_costo) {
             mejor_deposito = deposito;
