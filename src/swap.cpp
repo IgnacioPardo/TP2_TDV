@@ -1,5 +1,6 @@
 #include "swap.h"
 #include "greedy_mincost.h"
+#include "binpacking.h"
 #include <iostream>
 #include <random>
 
@@ -8,19 +9,19 @@ Swap::~Swap() {}
 void Swap::solve() {
     auto start = std::chrono::steady_clock::now();
 
-    GreedyMinCost greedy(this->_instance);
-    greedy.solve();
+    // GreedyMinCost greedy(this->_instance);
+    // greedy.solve();
+    // GapSolution solution = greedy.get_solution();
 
-    GapSolution solution = greedy.get_solution();
+    BinPacking binpacking(this->_instance);
+    binpacking.solve();
+    GapSolution solution = binpacking.get_solution();
 
-    int new_cost;
+    this->_solution = solution;
     
     for (int i = 0; i < 10; i++){
-        new_cost = this->perform_swap(solution, 10);
+        this->perform_swap(1000);
     }
-    
-    this->_solution = solution;
-    this->_solution.set_cost(new_cost);
 
     auto end = std::chrono::steady_clock::now();
     this->_solution_time = std::chrono::duration<double, std::milli>(end - start).count();
@@ -28,12 +29,13 @@ void Swap::solve() {
     this->_solution.set_time(this->_solution_time);
 }
 
-int Swap::perform_swap(GapSolution &solution, int tries = 10){
-    GapSolution partial_solution = solution;
+void Swap::perform_swap(int tries = 10){
+    GapSolution partial_solution = this->_solution;
 
-    double partial_cost = solution.cost();
+    double partial_cost = this->_solution.cost();
 
-    while (partial_cost == solution.cost() && tries > 0){
+    while (partial_cost == this->_solution.cost() && tries > 0)
+    {
 
         int v_i;
         int v_j;
@@ -44,16 +46,16 @@ int Swap::perform_swap(GapSolution &solution, int tries = 10){
         while (d_i == -1 || d_j == -1){
 
             std::random_device rd;     
-            std::mt19937 rng(rd());   
-            std::uniform_int_distribution<int> uni(0,solution.n()); 
+            std::mt19937 rng(rd());
+            std::uniform_int_distribution<int> uni(0, this->_solution.n());
 
             // Tomamos dos vendedores al azar
-            v_i = uni(rng) % solution.n();
-            v_j = uni(rng) % solution.n();
+            v_i = uni(rng) % this->_solution.n();
+            v_j = uni(rng) % this->_solution.n();
 
             // Obtenemos los depositos asignados a cada vendedor
-            d_j = solution.deposito_asignado_al_vendedor(v_j);
-            d_i = solution.deposito_asignado_al_vendedor(v_i);
+            d_j = this->_solution.deposito_asignado_al_vendedor(v_j);
+            d_i = this->_solution.deposito_asignado_al_vendedor(v_i);
         }
     
         // Calculamos el espacio disponible en cada deposito para los vendedores en el caso de intercambiarlos
@@ -73,15 +75,15 @@ int Swap::perform_swap(GapSolution &solution, int tries = 10){
                 partial_cost = new_cost;
 
                 // Intercambiamos los depositos de los vendedores
-                solution.desasignar_deposito_de_vendedor(d_i, v_i);
-                solution.desasignar_deposito_de_vendedor(d_j, v_j);
+                this->_solution.desasignar_deposito_de_vendedor(d_i, v_i);
+                this->_solution.desasignar_deposito_de_vendedor(d_j, v_j);
 
-                solution.asignar_deposito_a_vendedor(d_i, v_j);
-                solution.asignar_deposito_a_vendedor(d_j, v_i);
+                this->_solution.asignar_deposito_a_vendedor(d_i, v_j);
+                this->_solution.asignar_deposito_a_vendedor(d_j, v_i);
             } 
         }
         tries--;
     }
-    return partial_cost;
-}
 
+    this->_solution.set_cost(partial_cost);
+}

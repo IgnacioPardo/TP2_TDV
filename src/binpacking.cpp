@@ -14,7 +14,7 @@ void BinPacking::solve(){
     for (int j = 0; j < this->_instance.n(); j++) {
         int deposito = this->get_mejor_deposito(j);
         
-        std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
+        // std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
 
         if (deposito == -1) {
             int demanda_maxima_vj = 0;
@@ -47,10 +47,11 @@ int BinPacking::get_mejor_deposito(int j) {
 
     // Busco el deposito i cuya capacidad al restarle la demanda del vendedor j sea la menor
     
-    std::vector<std::tuple<int, int>> capacidades_con_j;
+    std::vector<std::tuple<int, int>> capacidades_con_j(this->_instance.m());
 
     for (int deposito = 0; deposito < this->_instance.m(); deposito++) {
         int cap = this->get_capacidad_deposito(deposito) - this->_instance.demanda(deposito, j);
+
         capacidades_con_j[deposito] = std::make_tuple(cap, deposito);
     }
 

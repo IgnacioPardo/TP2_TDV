@@ -12,7 +12,7 @@ class Swap : public Solver {
         ~Swap();
 
         void solve();
-        int perform_swap(GapSolution &solution, int tries);
+        void perform_swap(int tries);
     
     private:
         int get_mejor_deposito(int j);

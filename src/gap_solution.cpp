@@ -60,8 +60,12 @@ void GapSolution::desasignar_deposito_de_vendedor(int i, int j) {
     // Desasignación del vendedor j del depósito i
     
     this->_deposito_asignado_a_vendedor[j] = -1;
-    this->_vendedores_asignados_a_deposito[i].erase(j);
-    
+
+    // Del set de vendedores asignados al depósito i, borramos al vendedor j como item
+    auto it = this->_vendedores_asignados_a_deposito[i].find(j);
+    if (it != this->_vendedores_asignados_a_deposito[i].end()){
+        this->_vendedores_asignados_a_deposito[i].erase(it);
+    }
 }
 
 
