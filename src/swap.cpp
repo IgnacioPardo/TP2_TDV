@@ -14,13 +14,14 @@ void Swap::solve() {
     GapSolution solution = greedy.get_solution();
 
     this->_solution = solution;
+    this->_solution_time = solution.time();
     
     for (int i = 0; i < 10; i++){
         this->perform_swap(1000);
     }
 
     auto end = std::chrono::steady_clock::now();
-    this->_solution_time = std::chrono::duration<double, std::milli>(end - start).count();
+    this->_solution_time += std::chrono::duration<double, std::milli>(end - start).count();
 
     this->_solution.set_time(this->_solution_time);
 }
@@ -29,13 +30,14 @@ void Swap::solve(GapSolution solution) {
     auto start = std::chrono::steady_clock::now();
 
     this->_solution = solution;
+    this->_solution_time = solution.time();
     
     for (int i = 0; i < 10; i++){
         this->perform_swap(1000);
     }
 
     auto end = std::chrono::steady_clock::now();
-    this->_solution_time = std::chrono::duration<double, std::milli>(end - start).count();
+    this->_solution_time += std::chrono::duration<double, std::milli>(end - start).count();
 
     this->_solution.set_time(this->_solution_time);
 }
@@ -52,7 +54,6 @@ void Swap::perform_swap(int tries = 10){
         int v_j;
         int d_j = -1;
         int d_i = -1;
-        
         
         while (d_i == -1 || d_j == -1){
 
