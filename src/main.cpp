@@ -28,45 +28,45 @@ int main(int argc, char** argv) {
 
     // --------------------------------- GREEDY SOLUTION ---------------------------------------
 
-    GreedyMinCost greedy(instance);
+    // GreedyMinCost greedy(instance);
 
-    greedy.solve();
+    // greedy.solve();
 
-    GapSolution greedy_solution = greedy.get_solution();
+    // GapSolution greedy_solution = greedy.get_solution();
 
-    std::cout << "Greedy solution cost: " << greedy_solution.cost() << std::endl;
+    // std::cout << "Greedy solution cost: " << greedy_solution.cost() << std::endl;
 
     
     // ------------------------------ BINPACKING SOLUTION--------------------------------------
     
-    // BinPacking binpacking(instance);
+    BinPacking binpacking(instance);
 
-    // binpacking.solve();
+    binpacking.solve();
 
-    // GapSolution binpacking_solution = binpacking.get_solution();
+    GapSolution binpacking_solution = binpacking.get_solution();
 
-    // std::cout << "Bin Packing solution cost: " << binpacking_solution << std::endl;
+    std::cout << "Bin Packing solution cost: " << binpacking_solution << std::endl;
 
 
     // --------------------------------  SWAP LOCAL SOLUTION ------------------------------------------
 
-    Swap swap(instance);
+    // Swap swap(instance);
 
-    swap.solve();
+    // swap.solve();
 
-    GapSolution swap_solution = swap.get_solution();
+    // GapSolution swap_solution = swap.get_solution();
 
-    std::cout << "After Swap solution cost: " << swap_solution.cost() << std::endl;
+    // std::cout << "After Swap solution cost: " << swap_solution.cost() << std::endl;
 
     // --------------------------------  RELOCATE LOCAL SOLUTION ------------------------------------------
 
-    Relocate relocate(instance);
+    // Relocate relocate(instance);
 
-    relocate.solve();
+    // relocate.solve();
 
-    GapSolution relocate_solution = relocate.get_solution();
+    // GapSolution relocate_solution = relocate.get_solution();
 
-    std::cout << "After Relocate solution cost: " << relocate_solution.cost() << std::endl;
+    // std::cout << "After Relocate solution cost: " << relocate_solution.cost() << std::endl;
 
     return 0;
 }
