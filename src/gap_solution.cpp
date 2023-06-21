@@ -98,10 +98,10 @@ double GapSolution::time() const {
 
 std::ostream& operator<<(std::ostream& os, const GapSolution& solution){
 
-    os << "n: " << solution.n() << std::endl;
-    os << "m: " << solution.m() << std::endl;
-    os << "cost: " << solution.cost() << std::endl;
-    os << "time: " << solution.time() << std::endl;
+    os << "Cantidad de vendedores (n): " << solution.n() << std::endl;
+    os << "Cantidad de depositos (m): " << solution.m() << std::endl;
+    os << "Cost: " << solution.cost() << std::endl;
+    os << "Time: " << solution.time() << std::endl;
 
     /* for (int i = 0; i < solution.n(); i++) {
         os << "vendedor " << i << " -> deposito " << solution.deposito_asignado_al_vendedor(i) << std::endl;

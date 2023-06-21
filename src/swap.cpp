@@ -33,7 +33,7 @@ void Swap::solve(GapSolution solution) {
     this->_solution_time = solution.time();
     
     for (int i = 0; i < 10; i++){
-        this->perform_swap(1000);
+        this->perform_swap(100);
     }
 
     auto end = std::chrono::steady_clock::now();

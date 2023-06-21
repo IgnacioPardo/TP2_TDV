@@ -1,0 +1,86 @@
+---
+title: "Logística centralizada de primera milla"
+subtitle: "Diseño de Algoritmos - Licenciatura en Tecnología Digital - UTDT"
+author:
+- Luca Mazzarello^[lmazzarello@mail.utdt.edu]
+- Ignacio Pardo^[ipardo@mail.utdt.edu]
+date: "`r Sys.Date()`"
+abstract: |
+    El problema a investigar consiste en la asignacion de cada vendedor a un depósito para que utilice regularmente buscando cumplir con las capacidades máximas de cada depósito y buscando minimizar la distancia total recorrida por los vendedores.
+    Este trabajo presenta cinco algoritmos distintos para resolver el problema de GAP. 
+    Dos Heurísticas constructivas, dos operadores de busqueda local y una Metahurística. El objetivo de este informe es el de detallar los algoritmos comparando calidad de resultados, tiempo de ejecución e implicancias prácticas en relación al problema que enfrenta la empresa ThunderPack.
+output:
+  pdf_document:
+    toc: yes
+    #toc_depth: 2
+    number_sections: yes
+    fig_caption: yes
+---
+
+\newpage
+
+# introducción
+
+La empresa $\textbf{ThunderPack}$ es una $\textit{start-up}$ que ofrece servicios logísticos y gestiona una 
+red de comercios que actúan como puntos de consolidación para la recolección de paquetes. Sin embargo, la actual 
+modalidad de operación permite a los vendedores elegir libremente a qué depósito llevar sus paquetes, lo que 
+genera una utilización ineficiente de la capacidad de almacenamiento, reclamos y costos adicionales. Para 
+garantizar una buena experiencia a los vendedores, especialmente en eventos de alta demanda, $\textbf{ThunderPack}$ 
+está considerando migrar a una modalidad centralizada donde a cada vendedor se le asignará un depósito regularmente, 
+buscando cumplir con las capacidades máximas de cada depósito y minimizar la distancia total recorrida por los 
+vendedores.
+
+## Problema
+
+El problema descripto anteriormente puede ser modelado mediante el $\textbf{Problema de Asignación Generlizada}$ 
+(GAP, $\textit{Generalized Assignment Problem}$) que, en su versión más general, puede ser formulado de la 
+siguiente forma. Sea $N = {1,...,n}$ el conjunto de vendedores y $M = {1,...,m}$ el conjunto de depósitos. 
+Cada depósito $i ∈ M$ tiene una capacidad máxima de recepción $c_i$, medida en cantidad de unidades. Dado un 
+vendedor $j ∈ N$ y un depósito $i ∈ M$, dij denota la demanda (también en cantidad de unidades) a utilizar y 
+$c_{ij}$ el costo incurrido si $j$ es asignado a $i$. Con estas definiciones, podemos representar una solución 
+como una colección de conjuntos $Γ_1$,...,$Γ_m$ ⊆ N, con $Γ_i$ el subconjunto de venededores asignados al depósito 
+$i ∈ M$. Luego, el GAP consiste en:
+
+1. Asignar cada $j ∈ N$ a exactamente un depósito $i ∈ M$, es decir, $Γ_i$ ∩ $Γ_k$ = ∅ si $\cancel{i} = k$, $i$, $k ∈ M$;
+
+2. La capacidad de cada depósito no debe ser excedida, es decir, para $i ∈ M$
+
+$$
+\displaystyle\sum_{j\in{Γ_1}}^{} d_{ij} \leq c_i
+$$
+
+3. minimizar costo total de la asignacion dada por:
+
+$$
+\displaystyle\sum_{i=1}^{n} \displaystyle\sum_{j\in{Γ_1}}^{} c_{ij}
+$$
+
+En el contexto del problema de ThunderPack, tomaremos cij como la distancia que debe recorrer el vendedor j 
+en caso de ser asignado al depósito i. Notar que, dependiendo de las capacidades y las demandas, podría 
+dificultarse encontrar una solución factible que asigne a todos los vendedores y respete las capacidades. 
+Definimos:
+$$
+c_{max} = \max_{i ∈ M, j ∈ N} c_{ij}
+$$
+
+como la máxima distancia posible a recorrer por un vendedor. En caso de tener una solución parcial, donde 
+haya vendedores que no pueden ser asignados a algún depósito, se asumirá una penalización de $3 × d_max$ por 
+cada uno de ellos.
+
+Para cada vendedor, nuestra estimación de la demanda (en cantidad de unidades) es la misma independientemente 
+del depósito al que sea asignado, y por lo tanto $d_{ij} = d_j$. De todas formas, trabajaremos con la versión 
+general del GAP y, al momento de abordar las instancias con datos reales, serán un caso particular para el 
+algoritmo.
+
+# Heurísticas constructivas
+
+## Heurística constructiva golosa (Greedy Mincost)
+
+La primera heurística que se implementó es una heurística constructiva golosa. La misma consiste en asignar 
+a cada vendedor al depósito más cercano (el que sume el menor costo al total) que tenga capacidad disponible. 
+En caso de que no haya capacidad disponible en ningún depósito, los vendedores no se asignan y se asume la penalizacion
+de $3 × d_max$ por cada uno de ellos.
+
+## Heurística constructiva Binpacking
+
+
