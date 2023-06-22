@@ -33,7 +33,7 @@ void Swap::solve(GapSolution solution) {
     this->_solution_time = solution.time();
     
     for (int i = 0; i < 10; i++){
-        this->perform_swap(100);
+        this->perform_swap(10);
     }
 
     auto end = std::chrono::steady_clock::now();
@@ -55,7 +55,7 @@ void Swap::perform_swap(int tries = 10){
         int d_j = -1;
         int d_i = -1;
         
-        while (d_i == -1 || d_j == -1){
+        while (d_i == -1 && d_j == -1){
 
             std::random_device rd;     
             std::mt19937 rng(rd());
@@ -69,31 +69,78 @@ void Swap::perform_swap(int tries = 10){
             d_j = this->_solution.deposito_asignado_al_vendedor(v_j);
             d_i = this->_solution.deposito_asignado_al_vendedor(v_i);
         }
-    
-        // Calculamos el espacio disponible en cada deposito para los vendedores en el caso de intercambiarlos
-        double room_in_deposit_i = this->get_capacidad_deposito(d_i) + this->_instance.demanda(d_i, v_i);
-        double room_in_deposit_j = this->get_capacidad_deposito(d_j) + this->_instance.demanda(d_j, v_j);
 
-        // Si ambos depositos tienen espacio para los vendedores
-        if (room_in_deposit_i >= this->_instance.demanda(d_i, v_j) && room_in_deposit_j >= this->_instance.demanda(d_j, v_i)) {
+        // El vendedor i tiene deposito asignado y el vendedor j no
+        if(d_j == -1 && d_i != -1){ 
+            double room_in_deposit_i = this->get_capacidad_deposito(d_i) + this->_instance.demanda(d_i, v_i);
+
+            if (room_in_deposit_i >= this->_instance.demanda(d_i, v_j)) {
+            
+                // Calculamos el nuevo costo de intercambiar los vendedores
+                double new_cost = partial_cost + this->_instance.cost(d_i, v_j) - this->_instance.cost(d_i, v_i);
+
+                // Si el nuevo costo es menor al costo parcial
+                if (new_cost < partial_cost) {
+                    
+                    // Actualizamos el costo parcial
+                    partial_cost = new_cost;
+
+                    // Desasignamos el deposito del vendedor i y asignamos el deposito al vendedor j
+                    this->_solution.desasignar_deposito_de_vendedor(d_i, v_i);
+                    this->_solution.asignar_deposito_a_vendedor(d_i, v_j);
+                } 
+            }
+        }
+
+        // El vendedor j tiene deposito asignado y el vendedor i no
+        if(d_j != -1 && d_i == -1){
+            double room_in_deposit_j = this->get_capacidad_deposito(d_j) + this->_instance.demanda(d_j, v_j);
+
+            if (room_in_deposit_j >= this->_instance.demanda(d_j, v_i)) {
             
             // Calculamos el nuevo costo de intercambiar los vendedores
-            double new_cost = partial_cost + this->_instance.cost(d_i, v_j) + this->_instance.cost(d_j, v_i) - this->_instance.cost(d_i, v_i) - this->_instance.cost(d_j, v_j);
+            double new_cost = partial_cost + this->_instance.cost(d_j, v_i) - this->_instance.cost(d_j, v_j);
 
             // Si el nuevo costo es menor al costo parcial
-            if (new_cost < partial_cost) {
-                
-                // Actualizamos el costo parcial
-                partial_cost = new_cost;
+                if (new_cost < partial_cost) {
+                    
+                    // Actualizamos el costo parcial
+                    partial_cost = new_cost;
 
-                // Intercambiamos los depositos de los vendedores
-                this->_solution.desasignar_deposito_de_vendedor(d_i, v_i);
-                this->_solution.desasignar_deposito_de_vendedor(d_j, v_j);
-
-                this->_solution.asignar_deposito_a_vendedor(d_i, v_j);
-                this->_solution.asignar_deposito_a_vendedor(d_j, v_i);
-            } 
+                    // Desasignamos el deposito del vendedor i y asignamos el deposito al vendedor j
+                    this->_solution.desasignar_deposito_de_vendedor(d_j, v_j);
+                    this->_solution.asignar_deposito_a_vendedor(d_j, v_i);
+                } 
+            }
         }
+
+        else{
+            // Calculamos el espacio disponible en cada deposito para los vendedores en el caso de intercambiarlos
+            double room_in_deposit_i = this->get_capacidad_deposito(d_i) + this->_instance.demanda(d_i, v_i);
+            double room_in_deposit_j = this->get_capacidad_deposito(d_j) + this->_instance.demanda(d_j, v_j);
+
+            // Si ambos depositos tienen espacio para los vendedores
+            if (room_in_deposit_i >= this->_instance.demanda(d_i, v_j) && room_in_deposit_j >= this->_instance.demanda(d_j, v_i)) {
+                
+                // Calculamos el nuevo costo de intercambiar los vendedores
+                double new_cost = partial_cost + this->_instance.cost(d_i, v_j) + this->_instance.cost(d_j, v_i) - this->_instance.cost(d_i, v_i) - this->_instance.cost(d_j, v_j);
+
+                // Si el nuevo costo es menor al costo parcial
+                if (new_cost < partial_cost) {
+                    
+                    // Actualizamos el costo parcial
+                    partial_cost = new_cost;
+
+                    // Intercambiamos los depositos de los vendedores
+                    this->_solution.desasignar_deposito_de_vendedor(d_i, v_i);
+                    this->_solution.desasignar_deposito_de_vendedor(d_j, v_j);
+
+                    this->_solution.asignar_deposito_a_vendedor(d_i, v_j);
+                    this->_solution.asignar_deposito_a_vendedor(d_j, v_i);
+                } 
+            }
+        }
+
         tries--;
     }
 

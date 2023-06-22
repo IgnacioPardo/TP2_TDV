@@ -85,8 +85,8 @@ void results_to_csv(){
 }
 
 void tester(){
-    std::string filename = "instances/gap/gap_a/a05100";
-    // std::string filename = "instances/gap/gap_b/b05100";
+    // std::string filename = "instances/gap/gap_a/a05100";
+    std::string filename = "instances/gap/gap_b/b05100";
     // std::string filename = "instances/gap/gap_e/e801600";
     // std::string filename = "instances/real/real_instance";
 
@@ -198,9 +198,9 @@ void tester(){
 
 int main(int argc, char** argv) {
 
-    results_to_csv();
+    // results_to_csv();
 
-    // tester();
+    tester();
     
     return 0;
 }
