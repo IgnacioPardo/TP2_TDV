@@ -18,7 +18,7 @@ void results_to_csv(){
     std::ofstream log_file;
     std::string log_results_filename = "output/results.csv";
     log_file.open(log_results_filename, std::ios_base::app);
-    log_file << "Filename,Depositos,Vendedores,Greedy_cost,Greedy_time,Binpacking_cost,Binpacking_time,Swap(Greedy)_cost,Swap(Greedy)_time,Relocate(Greedy)_cost,Relocate(Greedy)_time,Metaheuristic_cost,Metaheuristic_time" << std::endl;
+    log_file << "Filename,Depositos,Vendedores,Greedy_cost,Greedy_time,Binpacking_cost,Binpacking_time,Swap(Greedy)_cost,Swap(Greedy)_time,Relocate(Bin Packing)_cost,Relocate(Bin Packing)_time,Metaheuristic_cost,Metaheuristic_time" << std::endl;
 
     std:: vector<std::string> index = {"gap/gap_a", "gap/gap_b", "gap/gap_e", "real"};
     
@@ -86,9 +86,10 @@ void results_to_csv(){
 
 void tester(){
     // std::string filename = "instances/gap/gap_a/a05100";
-    std::string filename = "instances/gap/gap_b/b05100";
+    // std::string filename = "instances/gap/gap_a/a05100";
+    // std::string filename = "instances/gap/gap_b/b05100";
     // std::string filename = "instances/gap/gap_e/e801600";
-    // std::string filename = "instances/real/real_instance";
+    std::string filename = "instances/real/real_instance";
 
     std::cout << "Reading file " << filename << std::endl;
 
@@ -98,10 +99,6 @@ void tester(){
 
     std::cout << "Vendedores: " << instance.n() << std::endl;
     std::cout << "Depósitos: " << instance.m() << std::endl;
-
-    // for (int i = 0; i < instance.m(); i++) {
-    //     std::cout << "capacidad " << i << ": " << instance.capacidad(i) << std::endl;
-    // }
 
     std::cout << std::endl;
 
@@ -118,7 +115,7 @@ void tester(){
     
     std::cout << std::endl;
 
-    // ------------------------------ BINPACKING SOLUTION---------------------------------------------------------------------------
+    // -------------------------------- BINPACKING SOLUTION---------------------------------------------------------------------------
     
     BinPacking binpacking(instance);
 
@@ -152,8 +149,8 @@ void tester(){
 
     GapSolution relocate_solution = relocate.get_solution();
 
-    std::cout << "Relocate (Greedy) solution cost: " << relocate_solution.cost() << std::endl;
-    std::cout << "Relocate (Greedy) solution time: " << relocate_solution.time() << std::endl;
+    std::cout << "Relocate (Bin Packing) solution cost: " << relocate_solution.cost() << std::endl;
+    std::cout << "Relocate (Bin Packing) solution time: " << relocate_solution.time() << std::endl;
 
     std::cout << std::endl;
 
