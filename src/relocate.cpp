@@ -50,8 +50,9 @@ void Relocate::perform_relocation(int tries = 1000){
     double partial_cost = this->_solution.cost();
 
     int v_aux;
+    int it_sin_mejora = 0;
     
-    while (partial_cost == this->_solution.cost() && tries > 0){
+    while (it_sin_mejora < tries){
 
         int v;
         int d = -1;
@@ -94,10 +95,13 @@ void Relocate::perform_relocation(int tries = 1000){
 
                     //this->_solution = solution;
                     this->_solution.set_cost(partial_cost);
+
+                    // Resetea la cantidad de iteraciones sin mejora
+                    it_sin_mejora = 0;
                 }
             }
         }
         v_aux = v;
-        tries--;
+        it_sin_mejora++;
     }
 }
