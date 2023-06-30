@@ -167,29 +167,29 @@ void tester(){
 
     std::cout << std::endl;
 
-    // --------------------------------  SWAP RELOCATE LOCAL SOLUTION ---------------------------------------------------------------
+    // --------------------------------  SWAP RELOCATE SWAP LOCAL SOLUTION ---------------------------------------------------------------
 
-    Swap swap_relocate(instance);
+    Swap swap_relocate_swap(instance);
 
-    swap_relocate.solve(relocate_swap_solution);
+    swap_relocate_swap.solve(relocate_swap_solution);
 
-    GapSolution swap_relocate_solution = swap_relocate.get_solution();
+    GapSolution swap_relocate_swap_solution = swap_relocate_swap.get_solution();
 
-    std::cout << "Swap (Relocate (Swap (Greedy))) solution cost: " << swap_relocate_solution.cost() << std::endl;
-    std::cout << "Swap (Relocate (Swap (Greedy))) solution time: " << swap_relocate_solution.time() << std::endl;
+    std::cout << "Swap (Relocate (Swap (Greedy))) solution cost: " << swap_relocate_swap_solution.cost() << std::endl;
+    std::cout << "Swap (Relocate (Swap (Greedy))) solution time: " << swap_relocate_swap_solution.time() << std::endl;
 
     std::cout << std::endl;
 
-    // --------------------------------  RELOCATE SWAP RELOCATE LOCAL SOLUTION ------------------------------------------------------
+    // -------- ------------------------  RELOCATE SWAP RELOCATE SWAP LOCAL SOLUTION ------------------------------------------------------
 
-    Relocate relocate_swap_relocate(instance);
+    Relocate relocate_swap_relocate_swap(instance);
 
-    relocate_swap_relocate.solve(swap_relocate_solution);
+    relocate_swap_relocate_swap.solve(swap_relocate_swap_solution);
 
-    GapSolution relocate_swap_relocate_solution = relocate_swap_relocate.get_solution();
+    GapSolution relocate_swap_relocate_swap_solution = relocate_swap_relocate_swap.get_solution();
 
-    std::cout << "Relocate (Swap (Relocate (Swap (Greedy)))) solution cost: " << relocate_swap_relocate_solution.cost() << std::endl;
-    std::cout << "Relocate (Swap (Relocate (Swap (Greedy)))) solution time: " << relocate_swap_relocate_solution.time() << std::endl;
+    std::cout << "Relocate (Swap (Relocate (Swap (Greedy)))) solution cost: " << relocate_swap_relocate_swap_solution.cost() << std::endl;
+    std::cout << "Relocate (Swap (Relocate (Swap (Greedy)))) solution time: " << relocate_swap_relocate_swap_solution.time() << std::endl;
     std::cout << std::endl;
 }
 
