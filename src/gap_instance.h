@@ -42,6 +42,10 @@ class GapInstance {
         // Costo de asignar el vendedor j al depósito i
         double cost(int i, int j) const;
 
+        // Penalización por no asignar el vendedor j a ningún depósito
+        double penalizacion(int j) const;
+
+
     private:
         // Cantidad de vendedores
         int _n;

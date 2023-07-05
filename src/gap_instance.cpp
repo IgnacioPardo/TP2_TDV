@@ -21,22 +21,31 @@ int GapInstance::m() const {
     return this->_m;
 }
 
-double GapInstance::capacidad(int i) const
-{
+double GapInstance::capacidad(int i) const{
     // Capacidad del depósito i
     return this->_c[i];
 }
 
-double GapInstance::demanda(int i, int j) const
-{
+double GapInstance::demanda(int i, int j) const{
     // Demanda del vendedor j para el depósito i
     return this->_d[i][j];
 }
 
-double GapInstance::cost(int i, int j) const
-{
+double GapInstance::cost(int i, int j) const{
     // Costo de asignar el vendedor j al depósito i
     return this->_cost[i][j];
+}
+
+double GapInstance::penalizacion(int j) const{
+    double demanda_maxima_vj = 0;
+    for (int i = 0; i < this->_m; i++){
+        double c_dem = demanda(i, j);
+        if (c_dem > demanda_maxima_vj){
+            demanda_maxima_vj = c_dem;
+        }
+    }
+    
+    return 3 * demanda_maxima_vj;
 }
 
 void GapInstance::_read(std::string filename){

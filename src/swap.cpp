@@ -60,7 +60,7 @@ void Swap::perform_swap(){
                 d_aux = this->_solution.deposito_asignado_al_vendedor(v_aux);
 
 
-                // El vendedor i tiene depósito asignado y el vendedor j no
+                // El vendedor v tiene depósito asignado y el vendedor v_aux no
                 if (d_aux == -1 && d_v != -1) {
                     
                     double room_in_deposit_i = this->get_capacidad_deposito(d_v) + this->_instance.demanda(d_v, v);
@@ -68,7 +68,7 @@ void Swap::perform_swap(){
                     if (room_in_deposit_i >= this->_instance.demanda(d_v, v_aux)) {
 
                         // Calculamos el nuevo costo de intercambiar los vendedores
-                        double new_cost = partial_cost + this->_instance.cost(d_v, v_aux) - this->_instance.cost(d_v, v);
+                        double new_cost = partial_cost + this->_instance.cost(d_v, v_aux) - this->_instance.cost(d_v, v) - this->_instance.penalizacion(v_aux) + this->_instance.penalizacion(v);
 
                         // Si el nuevo costo es menor al costo parcial
                         if (new_cost < partial_cost) {
@@ -76,7 +76,7 @@ void Swap::perform_swap(){
                             // Actualizamos el costo parcial
                             partial_cost = new_cost;
 
-                            // Desasignamos el depósito del vendedor j y asignamos el depósito al vendedor i
+                            // Desasignamos el depósito del vendedor v_aux y asignamos el depósito al vendedor v
                             this->_solution.desasignar_deposito_de_vendedor(d_v, v);
                             this->_solution.asignar_deposito_a_vendedor(d_v, v_aux);
 
@@ -85,7 +85,7 @@ void Swap::perform_swap(){
                     }
                 }
 
-                // El vendedor j tiene depósito asignado y el vendedor i no
+                // El vendedor v_aux tiene depósito asignado y el vendedor v no
                 else if (d_aux != -1 && d_v == -1) {
                     
                     double room_in_deposit_j = this->get_capacidad_deposito(d_aux) + this->_instance.demanda(d_aux, v_aux);
@@ -93,7 +93,7 @@ void Swap::perform_swap(){
                     if (room_in_deposit_j >= this->_instance.demanda(d_aux, v)) {
 
                         // Calculamos el nuevo costo de intercambiar los vendedores
-                        double new_cost = partial_cost + this->_instance.cost(d_aux, v) - this->_instance.cost(d_aux, v_aux);
+                        double new_cost = partial_cost + this->_instance.cost(d_aux, v) - this->_instance.cost(d_aux, v_aux) - this->_instance.penalizacion(v) + this->_instance.penalizacion(v_aux);
 
                         // Si el nuevo costo es menor al costo parcial
                         if (new_cost < partial_cost) {
