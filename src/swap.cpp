@@ -37,8 +37,11 @@ void Swap::local_search(){
     
     while (this->_solution.cost() < prev_cost || prev_cost == 0){
 
-        std::vector<std::tuple<GapSolution, int>> neighbours_w_cost = std::vector<std::tuple<GapSolution, int>>();
         
+        // std::cout << "New Solution" << std::endl;
+
+        std::vector<std::tuple<int, int, int, int, double>> swaps_w_cost = std::vector<std::tuple<int, int, int, int, double>>();
+
         // O(n * (n^2 - n) / 2)
         int max_cant = this->_instance.n() * (this->_instance.n() - 1) / 2;
         int progress = 0;
@@ -58,36 +61,67 @@ void Swap::local_search(){
 
                 if (v1 == v2)
                     continue;
-                // O(1)
-                if (this->_solution.deposito_asignado_al_vendedor(v1) == this->_solution.deposito_asignado_al_vendedor(v2))
-                    continue;
-                // O(1)
-                if (this->_solution.deposito_asignado_al_vendedor(v1) == -1 && this->_solution.deposito_asignado_al_vendedor(v2) == -1)
-                    continue;
                 
-                // O(n)
-                GapSolution neighbour = this->single_swap(v1, v2, this->_solution);
-                // O(n) + O(n)
-                if (neighbour.cost() < this->_solution.cost())
-                    neighbours_w_cost.push_back(std::make_tuple(neighbour, neighbour.cost()));
+                // O(1)
+                int d1 = this->_solution.deposito_asignado_al_vendedor(v1);
+                int d2 = this->_solution.deposito_asignado_al_vendedor(v2);
+
+                if (d1 == d2)
+                    continue;
+                if (d1 == -1 && d2 == -1)
+                    continue;
+
+                // std::cout << "Checking v1: " << v1 << " v2: " << v2 << " d1: " << d1 << " d2: " << d2 << std::endl;
+
+                std::tuple<bool, double> posible_swap = this->single_swap(v1, v2, d1, d2);
+
+                if (std::get<0>(posible_swap)){
+                    // std::cout << "Current cost: " << this->_solution.cost() << std::endl;
+                    // std::cout << "Swap Cost: " << std::get<1>(posible_swap) << std::endl;
+                    if (std::get<1>(posible_swap) < this->_solution.cost()){
+                        // std::cout << "Swap v1: " << v1 << " v2: " << v2 << " d1: " << d1 << " d2: " << d2 << std::endl;
+                        // std::cout << "Cost: " << std::get<1>(posible_swap) << std::endl;
+                        swaps_w_cost.push_back(std::make_tuple(v1, v2, d1, d2, std::get<1>(posible_swap)));
+                        // std::cout << "added" << std::endl;
+                    }
+                }
             }
         }
         
+        // std::cout << "# Neighbours: " << swaps_w_cost.size() << std::endl;
+        
         // erase progress
-        std::cout << "\033[A\033[2K";
+        // std::cout << "\033[A\033[2K";
 
-        if (neighbours_w_cost.size() > 0)
+        if (swaps_w_cost.size() > 0)
         {
             
             // sort neighbours by cost
-            std::sort(neighbours_w_cost.begin(), neighbours_w_cost.end(), [](const std::tuple<GapSolution, int> &a, const std::tuple<GapSolution, int> &b) -> bool { return std::get<1>(a) < std::get<1>(b); });
+            std::sort(swaps_w_cost.begin(), swaps_w_cost.end(), [](std::tuple<int, int, int, int, double> a, std::tuple<int, int, int, int, double> b) {
+                return std::get<4>(a) < std::get<4>(b);
+            });
 
-            // cantidad de vecinos que mejoran la solucion
-            int n = neighbours_w_cost.size();
-            std::cout << "# Neighbours: " << n << std::endl;
-            
+            // std::cout << "Sorted" << std::endl;
+
             prev_cost = this->_solution.cost();
-            this->_solution = std::get<0>(neighbours_w_cost[0]);
+            // std::cout << "Prev Cost: " << prev_cost << std::endl;
+            // perform swap
+
+            std::tuple<int, int, int, int, double> best_swap = swaps_w_cost[0];
+
+            int v1 = std::get<0>(best_swap);
+            int v2 = std::get<1>(best_swap);
+            int d1 = std::get<2>(best_swap);
+            int d2 = std::get<3>(best_swap);
+
+            // std::cout << "Best Swap v1: " << v1 << " v2: " << v2 << " d1: " << d1 << " d2: " << d2 << std::endl;
+            // std::cout << "Cost: " << std::get<4>(best_swap) << std::endl;
+
+            this->do_swap(v1, v2, d1, d2);
+            
+            // this->_solution.set_cost(std::get<4>(best_swap));
+            this->_solution.recalc_cost();
+        
         }
         else
         {
@@ -96,54 +130,64 @@ void Swap::local_search(){
     }
 }
 
-GapSolution Swap::single_swap(int v1, int v2, GapSolution sol)
-{
+void Swap::do_swap(int v1, int v2, int d1, int d2){
+
+    // std::cout << "Doing swap" << std::endl;
+
+    if (d1 == -1){
+        // std::cout << "d1 == -1" << std::endl;
+        this->_solution.desasignar_deposito_de_vendedor(d2, v2);
+        this->_solution.asignar_deposito_a_vendedor(d2, v1);
+        return;
+    }
+    else if (d2 == -1){
+        // std::cout << "d2 == -1" << std::endl;
+        this->_solution.desasignar_deposito_de_vendedor(d1, v1);
+        this->_solution.asignar_deposito_a_vendedor(d1, v2);
+        return;
+    }
+
+    // std::cout << "Symmetric" << std::endl;
+
+    this->_solution.desasignar_deposito_de_vendedor(d1, v1);
+    this->_solution.desasignar_deposito_de_vendedor(d2, v2);
+    this->_solution.asignar_deposito_a_vendedor(d1, v2);
+    this->_solution.asignar_deposito_a_vendedor(d2, v1);
+}
+
+std::tuple<bool, double> Swap::single_swap(int v1, int v2, int d1, int d2){
     
-    if (sol.deposito_asignado_al_vendedor(v1) == -1){ // O(1)
-        return this->swap_over_unasigned(v2, v1, sol);
+    if (this->_solution.deposito_asignado_al_vendedor(v1) == -1){ // O(1)
+        return this->swap_over_unasigned(v2, v1, d2);
     }
-    else if (sol.deposito_asignado_al_vendedor(v2) == -1){ // O(1)
-        return this->swap_over_unasigned(v1, v2, sol);
+    else if (this->_solution.deposito_asignado_al_vendedor(v2) == -1){ // O(1)
+        return this->swap_over_unasigned(v1, v2, d1);
     }
 
-    GapSolution new_sol = sol.copy();
-
-    int d1 = new_sol.deposito_asignado_al_vendedor(v1);
-    int d2 = new_sol.deposito_asignado_al_vendedor(v2);
-
-    // O(n)
+    // O(1)
     if (this->get_capacidad_deposito(d1) + this->_instance.demanda(d1, v1) > this->_instance.demanda(d1, v2)
      && this->get_capacidad_deposito(d2) + this->_instance.demanda(d2, v2) > this->_instance.demanda(d2, v1)){
-
-        //O(n)
-        new_sol.desasignar_deposito_de_vendedor(d1, v1);
-        new_sol.desasignar_deposito_de_vendedor(d2, v2);
-
-        new_sol.asignar_deposito_a_vendedor(d1, v2);
-        new_sol.asignar_deposito_a_vendedor(d2, v1);
-
+        double new_cost = this->_solution.cost() - this->_instance.cost(d1, v1) - this->_instance.cost(d2, v2) + this->_instance.cost(d1, v2) + this->_instance.cost(d2, v1);
+        
+        
+        if (this->_solution.cost() > new_cost)
+        {
+            // std::cout << "Better Cost: " << new_cost << std::endl;
+            return std::make_tuple(true, new_cost);
+        }
     }
 
-    return new_sol;
+    return std::make_tuple(false, 0);
 }
-    
-GapSolution Swap::swap_over_unasigned(int va, int vu, GapSolution sol){
-    /*
-        int va: vendedor asignado
-        int vu: vendedor unassigned
-    */
 
-    GapSolution new_sol = sol.copy();
-
-    int da = sol.deposito_asignado_al_vendedor(va);
+std::tuple<bool, double> Swap::swap_over_unasigned(int va, int vu, int da){
 
     if (this->get_capacidad_deposito(da) + this->_instance.demanda(da, va) > this->_instance.demanda(da, vu))
     {
-        new_sol.desasignar_deposito_de_vendedor(da, va);
-        new_sol.asignar_deposito_a_vendedor(da, vu);
+        return std::make_tuple(true, this->_solution.cost() - this->_instance.cost(da, vu) + this->_instance.cost(da, va));
     }
 
-    return new_sol;
+    return std::make_tuple(false, 0);
 }
 
 void Swap::perform_swap()

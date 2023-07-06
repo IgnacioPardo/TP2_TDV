@@ -96,7 +96,9 @@ void Relocate::local_search(){
     while (this->_solution.cost() < prev_cost || prev_cost == 0)
     {
         
-        std::vector<std::tuple<GapSolution, int>> neighbours_w_cost = std::vector<std::tuple<GapSolution, int>>();
+        // std::vector<std::tuple<GapSolution, int>> neighbours_w_cost = std::vector<std::tuple<GapSolution, int>>();
+
+        std::vector<std::tuple<int, int, int>> relocation_w_cost = std::vector<std::tuple<int, int, int>>();
         
         int max_cant = this->_instance.n() * this->_instance.m();
         int progress = 0;
@@ -108,37 +110,60 @@ void Relocate::local_search(){
             for (int d = 0; d < this->_solution.m(); d++){
                 progress++;
 
-                // erase line
-                std::cout << "\033[A\033[2K";
-
-                // print progress with timer and ETA
-                std::cout << "Progress: " << progress << "/" << max_cant << " ";
-                std::cout << time_format_(std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count() / 1000);
-                std::cout << "/" << time_format_(std::chrono::duration<double, std::milli>((std::chrono::steady_clock::now() - start) / progress * (max_cant - progress)).count() / 1000);
-                std::cout << std::endl;
+                // std::cout << "\033[A\033[2K";
+                // std::cout << "Progress: " << progress << "/" << max_cant << " ";
+                // std::cout << time_format_(std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count() / 1000);
+                // std::cout << "/" << time_format_(std::chrono::duration<double, std::milli>((std::chrono::steady_clock::now() - start) / progress * (max_cant - progress)).count() / 1000);
+                // std::cout << std::endl;
 
                 if (this->_solution.deposito_asignado_al_vendedor(v) == d)
                     continue;
 
-                GapSolution neighbour = this->single_relocation(v, d, this->_solution);
+                std::tuple<bool, double> relocation = this->single_relocation(v, d);
 
-                if (neighbour.cost() < this->_solution.cost())
-                    neighbours_w_cost.push_back(std::make_tuple(neighbour, neighbour.cost()));
+                if (std::get<0>(relocation))
+                {
+                    if (std::get<1>(relocation) < this->_solution.cost()){
+                        // std::cout << "Cost: " << this->_solution.cost() << " -> " << std::get<1>(relocation) << std::endl;
+                        relocation_w_cost.push_back(std::make_tuple(v, d, std::get<1>(relocation)));
+                    }
+                }
             }
         }
 
-        if (neighbours_w_cost.size() > 0)
+        if (relocation_w_cost.size() > 0)
         {
-            std::sort(neighbours_w_cost.begin(), neighbours_w_cost.end(), [](const std::tuple<GapSolution, int> &a, const std::tuple<GapSolution, int> &b) {
-                return std::get<1>(a) < std::get<1>(b);
+            std::sort(relocation_w_cost.begin(), relocation_w_cost.end(), [](std::tuple<int, int, int> a, std::tuple<int, int, int> b) {
+                return std::get<2>(a) < std::get<2>(b);
             });
 
             // Cantidad de vecinos
 
-            std::cout << "# Neighbours: " << neighbours_w_cost.size() << std::endl << std::endl;
+            // std::cout << "# Neighbours: " << relocation_w_cost.size() << std::endl;
 
             prev_cost = this->_solution.cost();
-            this->_solution = std::get<0>(neighbours_w_cost[0]);
+            
+            std::tuple<int, int, int> best_relocation = relocation_w_cost[0];
+
+            int v = std::get<0>(best_relocation);
+            int d = std::get<1>(best_relocation);
+            double best_cost = std::get<2>(best_relocation);
+
+            // std::cout << "Relocating " << v << " to " << d << " with cost " << best_cost << std::endl;
+
+            int prev_d = this->_solution.deposito_asignado_al_vendedor(v);
+
+            // std::cout << "Relocating " << v << " from prev d: " << prev_d << " new d: " << d << std::endl;
+            // std::cout << "with costs: " << this->_instance.cost(prev_d, v) << " -> " << this->_instance.cost(d, v) << std::endl;
+
+            this->_solution.desasignar_deposito_de_vendedor(prev_d, v);
+            this->_solution.asignar_deposito_a_vendedor(d, v);
+
+            // std::cout << std::endl;
+            // std::cout << "prev cost: " << prev_cost << std::endl;
+            // std::cout << "Cost: " << this->_solution.cost() << " -> " << best_cost << std::endl;
+            this->_solution.recalc_cost();
+            // std::cout << "Recalculated cost: " << this->_solution.cost() << std::endl;
         }
         else
         {
@@ -148,14 +173,18 @@ void Relocate::local_search(){
     }
 }
 
-GapSolution Relocate::single_relocation(int v, int d, GapSolution sol){
+std::tuple<bool, double> Relocate::single_relocation(int v, int d){
 
-    GapSolution new_sol = sol.copy();
+    if (this->get_capacidad_deposito(d) > this->_instance.demanda(d, v))
+    {
 
-    // Si hay capacidad en el deposito para el vendedor lo reubico
-    if (this->get_capacidad_deposito(d) > this->_instance.demanda(d, v)){
-        new_sol.desasignar_deposito_de_vendedor(new_sol.deposito_asignado_al_vendedor(v), v);
-        new_sol.asignar_deposito_a_vendedor(d, v);
+        double new_cost = this->_solution.cost() - this->_instance.cost(this->_solution.deposito_asignado_al_vendedor(v), v) + this->_instance.cost(d, v);
+
+        if (new_cost < this->_solution.cost())
+        {
+            
+            return std::make_tuple(true, new_cost);
+        }
     }
-    return new_sol;
+    return std::make_tuple(false, 0);
 }

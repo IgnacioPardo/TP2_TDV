@@ -38,4 +38,10 @@ class Solver {
         double _solution_time;
 };
 
+class AlteringSolver : public Solver {
+    public:
+        using Solver::Solver;
+        void solve(GapSolution solution);
+};
+
 #endif // GREEDY_H

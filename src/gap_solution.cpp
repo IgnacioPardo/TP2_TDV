@@ -16,6 +16,7 @@ GapSolution::GapSolution(GapInstance instance) {
 
     this->_deposito_asignado_a_vendedor = std::vector<int>(this->_n, -1);
     this->_vendedores_asignados_a_deposito = std::vector<std::set<int>>(this->_m);
+    this->_capacidad_usada_deposito = std::vector<int>(this->_m, 0);
 }
 
 GapSolution::~GapSolution() {}
@@ -28,6 +29,10 @@ int GapSolution::n() const {
 int GapSolution::m() const {
     // Cantidad de depósitos
     return this->_m;
+}
+
+int GapSolution::capacidad_actual_deposito(int i) const {
+    return this->_instance.capacidad(i) - this->_capacidad_usada_deposito[i];
 }
 
 int GapSolution::deposito_asignado_al_vendedor(int j) const {
@@ -45,7 +50,11 @@ std::vector<int> GapSolution::vendedores_asignados_al_deposito(int i) const {
     return vendedores_asignados;
 }
 
-void GapSolution::_calc_cost() {
+void GapSolution::set_cost(double cost) {
+    this->_cost = cost;
+}
+
+void GapSolution::recalc_cost() {
     // Costo total de la solución
 
     double calculated_cost = 0;
@@ -62,18 +71,7 @@ void GapSolution::_calc_cost() {
 
 double GapSolution::cost() const {
     // Costo total de la solución
-    // return this->_cost;
-
-    double calculated_cost = 0;
-
-    for (int i = 0; i < this->_n; i++)
-    {
-        int j = this->_deposito_asignado_a_vendedor[i];
-
-        calculated_cost += this->_instance.cost(j, i);
-    }
-
-    return calculated_cost;
+    return this->_cost;
 }
 
 void GapSolution::asignar_deposito_a_vendedor(int i, int j) {
@@ -82,8 +80,9 @@ void GapSolution::asignar_deposito_a_vendedor(int i, int j) {
     this->_deposito_asignado_a_vendedor[j] = i;
     this->_vendedores_asignados_a_deposito[i].insert(j);
 
-    // this->_calc_cost();
+    this->_capacidad_usada_deposito[i] += this->_instance.demanda(i, j);
 
+    this->_cost += this->_instance.cost(i, j);
 }
 
 void GapSolution::desasignar_deposito_de_vendedor(int i, int j) {
@@ -97,7 +96,10 @@ void GapSolution::desasignar_deposito_de_vendedor(int i, int j) {
         this->_vendedores_asignados_a_deposito[i].erase(it);
     }
 
-    // this->_calc_cost();
+    this->_capacidad_usada_deposito[i] -= this->_instance.demanda(i, j);
+
+    this->_cost -= this->_instance.cost(i, j);
+    this->_cost += this->_instance.penalizacion(j);
 }
 
 
@@ -190,9 +192,10 @@ GapSolution GapSolution::copy(){
     GapSolution solution(this->_instance);
     solution.set_time(this->_time);
     
-    for (int i = 0; i < this->_n; i++) {
+    // O(n*m)
+    for (int i = 0; i < this->_n; i++) { // O(n)
         if (this->_deposito_asignado_a_vendedor[i] != -1)
-            solution.asignar_deposito_a_vendedor(this->_deposito_asignado_a_vendedor[i], i);
+            solution.asignar_deposito_a_vendedor(this->_deposito_asignado_a_vendedor[i], i); // O(m)
     }
 
     return solution;

@@ -12,8 +12,9 @@ void GreedyMinCost::solve(){
         int deposito = this->get_mejor_deposito(j);
         
         // std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
-        if (deposito != -1) 
+        if (deposito != -1) {
             this->_solution.asignar_deposito_a_vendedor(deposito, j);
+        }
     }
     auto end = std::chrono::steady_clock::now();
     this->_solution_time = std::chrono::duration<double, std::milli>(end - start).count();

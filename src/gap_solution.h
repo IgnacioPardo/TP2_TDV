@@ -42,6 +42,12 @@ class GapSolution {
         // Desasignación del vendedor j del depósito i
         void desasignar_deposito_de_vendedor(int i, int j);
 
+        // Capacidad actual del depósito i
+        int capacidad_actual_deposito(int i) const;
+
+        // Set costo total de la solución
+        void set_cost(double cost);
+
         // Set cantidad de vendedores
         void set_n(int n);
 
@@ -65,6 +71,8 @@ class GapSolution {
         bool operator<=(const GapSolution& other) const;
         bool operator>=(const GapSolution& other) const;
 
+        void recalc_cost();
+
     private :
         // Instancia
         GapInstance _instance;
@@ -78,8 +86,6 @@ class GapSolution {
         // Costo total de la solución
         double _cost;
 
-        void _calc_cost();
-
         // Deposito asignado al vendedor j
         std::vector<int> _deposito_asignado_a_vendedor;
 
@@ -88,6 +94,9 @@ class GapSolution {
         
         // Tiempo en resolver el problema
         double _time;
+
+        // Capacidad usada por cada depósito
+        std::vector<int> _capacidad_usada_deposito;
 };
 
 #endif // GAP_SOLUTION_H
