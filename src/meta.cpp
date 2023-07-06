@@ -98,4 +98,5 @@ void Meta::solve() {
     //end timer
     auto end = std::chrono::high_resolution_clock::now();
     this->_solution_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    this->_solution.set_time(this->_solution_time);
 }
