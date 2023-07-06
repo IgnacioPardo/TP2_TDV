@@ -11,18 +11,18 @@ class Swap : public AlteringSolver {
         using AlteringSolver::AlteringSolver;
         ~Swap();
 
+
+        void set_solution(GapSolution solution);
         void solve(GapSolution solution);
+        virtual std::string get_name() const override;
 
         void local_search();
-        void perform_swap();
+        std::vector<std::tuple<int, int, int, int, double>> neighbourhood();
 
         std::tuple<bool, double> single_swap(int v1, int v2, int d1, int d2);
         std::tuple<bool, double> swap_over_unasigned(int va, int vu, int da);
 
         void do_swap(int v1, int v2, int d1, int d2);
-
-    private:
-        int get_mejor_deposito(int j);
 };
 
 #endif // SWAP_H

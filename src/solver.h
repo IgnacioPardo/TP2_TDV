@@ -14,6 +14,9 @@ class Solver {
 
         // Getters
 
+        // Get Solver Name
+        virtual std::string get_name() const; 
+
         // Get Solution
         GapSolution get_solution() const;
 
@@ -42,6 +45,8 @@ class AlteringSolver : public Solver {
     public:
         using Solver::Solver;
         void solve(GapSolution solution);
+
+        virtual std::string get_name() const override;
 };
 
 #endif // GREEDY_H

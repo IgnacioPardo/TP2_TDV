@@ -12,6 +12,8 @@ class GreedyMinCost : public Solver {
         ~GreedyMinCost();
 
         void solve();
+
+        virtual std::string get_name() const override;
     
     private:
         int get_mejor_deposito(int j);

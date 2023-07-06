@@ -4,7 +4,14 @@
 
 BinPacking::~BinPacking() {}
 
+std::string BinPacking::get_name() const {
+    return "BinPacking";
+}
+
 void BinPacking::solve(){
+    /*
+    *   A cada vendedor j le asigno el deposito i cuya capacidad al restarle la demanda del vendedor j sea la menor
+    */
 
     auto start = std::chrono::steady_clock::now();
     
@@ -27,6 +34,11 @@ void BinPacking::solve(){
 }
 
 int BinPacking::get_mejor_deposito(int j) {
+    /*
+    *   Devuelve el deposito que tenga menor espacio restante luego de mi demanda y que cumpla con la demanda del vendedor j.
+    *   Si no hay deposito que cumpla con la demanda del vendedor j, devuelve -1.
+    */
+
     int mejor_deposito = -1;
     int mejor_costo = -1;
 

@@ -4,20 +4,18 @@
 #include "swap.h"
 #include <random>
 
-std::string time_format_(double time)
-{
-    int hours = time / 3600;
-    int minutes = (time - hours * 3600) / 60;
-    int seconds = time - hours * 3600 - minutes * 60;
-
-    std::string time_str = std::to_string(hours) + ":" + std::to_string(minutes) + ":" + std::to_string(seconds);
-
-    return time_str;
-}
-
 Relocate::~Relocate() {}
 
+std::string Relocate::get_name() const {
+    return "Relocate";
+}
+
 void Relocate::solve(GapSolution solution){
+    /*
+    *  Aplica la heuristica de bisqueda local Relocate a la solución pasada por parámetro.
+    *  La solución pasada por parámetro es la solución inicial debe ser una solución factible.s
+    */
+
     auto start = std::chrono::steady_clock::now();
 
     this->_solution = solution;
@@ -31,65 +29,12 @@ void Relocate::solve(GapSolution solution){
     this->_solution.set_time(this->_solution_time);
 }
 
-void Relocate::perform_relocation(int tries = 1000){
-    
-    double partial_cost = this->_solution.cost();
-
-    int v_aux;
-    int it_sin_mejora = 0;
-    
-    while (it_sin_mejora < tries){
-
-        int v;
-        int d = -1;
-
-        // Si el vendedor no tiene deposito asignado o el vendedor es el mismo que el anterior
-        while (d == -1 || v == v_aux){
-
-            std::random_device rd;
-            std::mt19937 rng(rd());
-            std::uniform_int_distribution<int> uni(0, this->_solution.n());
-
-            // Obtiene un vendedor al azar
-            v = uni(rng) % this->_solution.n();
-
-            // Obtiene el deposito asignado al vendedor
-            d = this->_solution.deposito_asignado_al_vendedor(v);
-        }
-
-        // Recorre todos los depositos
-        for (int i = 0; i < this->_solution.m(); i++){
-            
-            // Si el deposito tiene espacio para el vendedor
-            if (this->get_capacidad_deposito(i) > this->_instance.demanda(i, v) && i != d){
-
-                int d_aux = this->_solution.deposito_asignado_al_vendedor(v);
-
-                // Calcula el nuevo costo de integrar el vendedor al deposito y sacarlo del deposito anterior
-                double new_cost = partial_cost + this->_instance.cost(i, v) - this->_instance.cost(d_aux, v);
-
-                // Si el nuevo costo es menor al costo parcial
-                if (new_cost < partial_cost){
-                    // Actualiza el costo parcial
-                    partial_cost = new_cost;
-
-                    // Desasigna el deposito del vendedor
-                    this->_solution.desasignar_deposito_de_vendedor(d_aux, v);
-
-                    // Asigna el deposito nuevo al vendedor
-                    this->_solution.asignar_deposito_a_vendedor(i, v);
-
-                    // Resetea la cantidad de iteraciones sin mejora
-                    it_sin_mejora = 0;
-                }
-            }
-        }
-        v_aux = v;
-        it_sin_mejora++;
-    }
-}
-
 void Relocate::local_search(){
+    /*
+    *  Genera los vecinos de la solución actual y se queda con el mejor.
+    *  Repite hasta que no haya mejora.
+    *  Los vecinos son todas aquellas soluciones que puedo obtener de realizar una reubicación de un vendedor a un depósito.
+    */
 
     double prev_cost = 0;
 
@@ -99,22 +44,10 @@ void Relocate::local_search(){
         // std::vector<std::tuple<GapSolution, int>> neighbours_w_cost = std::vector<std::tuple<GapSolution, int>>();
 
         std::vector<std::tuple<int, int, int>> relocation_w_cost = std::vector<std::tuple<int, int, int>>();
-        
-        int max_cant = this->_instance.n() * this->_instance.m();
-        int progress = 0;
-        // timer
-        auto start = std::chrono::steady_clock::now();
 
         // O(n*m)
         for (int v = 0; v < this->_solution.n(); v++){
             for (int d = 0; d < this->_solution.m(); d++){
-                progress++;
-
-                // std::cout << "\033[A\033[2K";
-                // std::cout << "Progress: " << progress << "/" << max_cant << " ";
-                // std::cout << time_format_(std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count() / 1000);
-                // std::cout << "/" << time_format_(std::chrono::duration<double, std::milli>((std::chrono::steady_clock::now() - start) / progress * (max_cant - progress)).count() / 1000);
-                // std::cout << std::endl;
 
                 if (this->_solution.deposito_asignado_al_vendedor(v) == d)
                     continue;
@@ -139,31 +72,39 @@ void Relocate::local_search(){
 
             // Cantidad de vecinos
 
-            // std::cout << "# Neighbours: " << relocation_w_cost.size() << std::endl;
+            //std::cout << "# Neighbours: " << relocation_w_cost.size() << std::endl;
 
             prev_cost = this->_solution.cost();
+
             
             std::tuple<int, int, int> best_relocation = relocation_w_cost[0];
 
             int v = std::get<0>(best_relocation);
             int d = std::get<1>(best_relocation);
+
             double best_cost = std::get<2>(best_relocation);
 
-            // std::cout << "Relocating " << v << " to " << d << " with cost " << best_cost << std::endl;
+            //std::cout << "Relocating " << v << " to " << d << " with cost " << best_cost << std::endl;
 
             int prev_d = this->_solution.deposito_asignado_al_vendedor(v);
 
-            // std::cout << "Relocating " << v << " from prev d: " << prev_d << " new d: " << d << std::endl;
-            // std::cout << "with costs: " << this->_instance.cost(prev_d, v) << " -> " << this->_instance.cost(d, v) << std::endl;
+            //std::cout << "Relocating " << v << " from prev d: " << prev_d << " new d: " << d << std::endl;
+            //std::cout << "with costs: " << this->_instance.cost(prev_d, v) << " -> " << this->_instance.cost(d, v) << std::endl;
 
-            this->_solution.desasignar_deposito_de_vendedor(prev_d, v);
+
+            //std::cout << "Desasignando deposito " << prev_d << " de vendedor " << v << std::endl;
+
+            if (prev_d != -1)
+                this->_solution.desasignar_deposito_de_vendedor(prev_d, v);
+
+            //std::cout << "Asignando deposito " << d << " a vendedor " << v << std::endl;
             this->_solution.asignar_deposito_a_vendedor(d, v);
 
-            // std::cout << std::endl;
-            // std::cout << "prev cost: " << prev_cost << std::endl;
-            // std::cout << "Cost: " << this->_solution.cost() << " -> " << best_cost << std::endl;
+            //std::cout << std::endl;
+            //std::cout << "prev cost: " << prev_cost << std::endl;
+            //std::cout << "Cost: " << this->_solution.cost() << " -> " << best_cost << std::endl;
             this->_solution.recalc_cost();
-            // std::cout << "Recalculated cost: " << this->_solution.cost() << std::endl;
+            //std::cout << "Recalculated cost: " << this->_solution.cost() << std::endl;
         }
         else
         {
@@ -174,17 +115,17 @@ void Relocate::local_search(){
 }
 
 std::tuple<bool, double> Relocate::single_relocation(int v, int d){
+    /*
+    *  Devuelve true si la reubicación es factible, false en caso contrario.
+    *  Devuelve el costo de la reubicación.
+    */
 
     if (this->get_capacidad_deposito(d) > this->_instance.demanda(d, v))
     {
 
         double new_cost = this->_solution.cost() - this->_instance.cost(this->_solution.deposito_asignado_al_vendedor(v), v) + this->_instance.cost(d, v);
 
-        if (new_cost < this->_solution.cost())
-        {
-            
-            return std::make_tuple(true, new_cost);
-        }
+        return std::make_tuple(true, new_cost);
     }
     return std::make_tuple(false, 0);
 }

@@ -11,12 +11,13 @@ GapSolution::GapSolution(GapInstance instance) {
     this->_instance = instance;
     this->_n = instance.n();
     this->_m = instance.m();
-    this->_cost = 0;
     this->_time = 0;
 
     this->_deposito_asignado_a_vendedor = std::vector<int>(this->_n, -1);
     this->_vendedores_asignados_a_deposito = std::vector<std::set<int>>(this->_m);
     this->_capacidad_usada_deposito = std::vector<int>(this->_m, 0);
+    
+    this->recalc_cost();
 }
 
 GapSolution::~GapSolution() {}
@@ -59,13 +60,16 @@ void GapSolution::recalc_cost() {
 
     double calculated_cost = 0;
 
-    for (int i = 0; i < this->_n; i++)
-    {
-        int j = this->_deposito_asignado_a_vendedor[i];
-
-        calculated_cost += this->_instance.cost(j, i);
+    for (int v = 0; v < this->_n; v++) {
+        int d = this->_deposito_asignado_a_vendedor[v];
+        if (d != -1) {
+            calculated_cost += this->_instance.cost(d, v);
+        }
+        else {
+            calculated_cost += this->_instance.penalizacion(v);
+        }
     }
-
+    
     this->_cost = calculated_cost;
 }
 
@@ -76,6 +80,10 @@ double GapSolution::cost() const {
 
 void GapSolution::asignar_deposito_a_vendedor(int i, int j) {
     // Asignación del vendedor j al depósito i
+
+    if (this->_deposito_asignado_a_vendedor[j] == -1) {
+        this->_cost -= this->_instance.penalizacion(j);
+    }
     
     this->_deposito_asignado_a_vendedor[j] = i;
     this->_vendedores_asignados_a_deposito[i].insert(j);

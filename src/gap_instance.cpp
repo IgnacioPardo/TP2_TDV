@@ -44,15 +44,13 @@ double GapInstance::cost(int i, int j) const{
 }
 
 double GapInstance::penalizacion(int j) const{
-    double demanda_maxima_vj = 0;
-    for (int i = 0; i < this->_m; i++){
-        double c_dem = demanda(i, j);
-        if (c_dem > demanda_maxima_vj){
-            demanda_maxima_vj = c_dem;
-        }
+    // Penalización del vendedor j
+
+    double max_cost = 0;
+    for (int k = 0; k < this->_m; k++){
+        max_cost = std::max(max_cost, this->_cost[k][j]);
     }
-    
-    return 3 * demanda_maxima_vj;
+    return 3 * max_cost;
 }
 
 void GapInstance::_read(std::string filename){
