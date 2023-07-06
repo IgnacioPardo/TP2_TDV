@@ -12,22 +12,6 @@
 #include "random_destroyer.h"
 #include "meta.h"
 
-GapSolution chain_solvers(GapInstance &instance, GapSolution &solution, std::vector<AlteringSolver *> solvers)
-{
-    /*
-    *   Funcion que recibe una instancia, una solucion y un vector de solvers.
-    *   Devuelve la solucion que se obtiene al aplicar los solvers en el orden en el que se encuentran en el vector.
-    *   Los solvers deben ser de tipo AlteringSolver.
-    */
-    GapSolution sol = solution;
-    for (auto AltSolverType : solvers)
-    {
-        AltSolverType->solve(sol);
-        sol = AltSolverType->get_solution().copy();
-    }
-    return sol;
-}
-
 void results_to_csv(){
     /*
     *   Funcion que genera un archivo csv con los resultados de las heurísticas.
@@ -105,8 +89,6 @@ void results_to_csv(){
 
             // --------------------------------------  SWAP + RELOCATE GREEDY LOCAL SOLUTION --------------------------------------------------------
 
-            // GapSolution swap_relocate_solution_g = chain_solvers(instance, greedy_solution, {&swap_g, &relocate_g});
-
             Swap swap_r_g(instance);
 
             swap_r_g.solve(relocate_solution.copy());
@@ -114,8 +96,6 @@ void results_to_csv(){
             GapSolution swap_relocate_solution_g = swap_r_g.get_solution();
 
             // --------------------------------------  RELOCATE + SWAP GREEDY LOCAL SOLUTION --------------------------------------------------------
-
-            // GapSolution relocate_swap_solution_g = chain_solvers(instance, greedy_solution, {&relocate_g, &swap_g});
 
             Relocate relocate_s_g(instance);
 
@@ -125,8 +105,6 @@ void results_to_csv(){
             
             // --------------------------------------  SWAP + RELOCATE BINPACKING LOCAL SOLUTION --------------------------------------------------------
 
-            // GapSolution swap_relocate_solution_b = chain_solvers(instance, binpacking_solution, {&swap_b, &relocate_b});
-
             Swap swap_r_b(instance);
 
             swap_r_b.solve(relocate_solution_b.copy());
@@ -134,8 +112,6 @@ void results_to_csv(){
             GapSolution swap_relocate_solution_b = swap_r_b.get_solution();
 
             // --------------------------------------  RELOCATE + SWAP BINPACKING LOCAL SOLUTION --------------------------------------------------------
-
-            // GapSolution relocate_swap_solution_b = chain_solvers(instance, binpacking_solution, {&relocate_b, &swap_b});
 
             Relocate relocate_s_b(instance);
 
@@ -271,8 +247,6 @@ void tester(){
 
     // --------------------------------  RELOCATE SWAP GREEDY LOCAL SOLUTION ---------------------------------------------------------------
 
-    // GapSolution relocate_swap_g_solution = chain_solvers(instance, greedy_solution, {&relocate, &swap_g});
-
     Relocate relocate_swap_g(instance);
 
     relocate_swap_g.solve(swap_g_solution.copy());
@@ -284,8 +258,6 @@ void tester(){
 
     // --------------------------------  SWAP RELOCATE GREEDY LOCAL SOLUTION ---------------------------------------------------------------
 
-    // GapSolution swap_relocate_g_solution = chain_solvers(instance, greedy_solution, {&swap_g, &relocate});
-
     Swap swap_relocate_g(instance);
 
     swap_relocate_g.solve(relocate_greedy_solution.copy());
@@ -296,8 +268,6 @@ void tester(){
     std::cout << "Swap (Relocate (Greedy)) solution time: " << swap_relocate_g_solution.time() << std::endl;
 
     // -------- ------------------------  RELOCATE SWAP RELOCATE SWAP GREEDY LOCAL SOLUTION ------------------------------------------------------
-
-    // GapSolution relocate_swap_relocate_swap_g_solution = chain_solvers(instance, greedy_solution, {&relocate, &swap_g, &relocate, &swap_g});
 
     Relocate relocate_swap_relocate_swap_g(instance);
 
