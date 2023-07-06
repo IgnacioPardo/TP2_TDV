@@ -11,10 +11,11 @@ class Relocate : public Solver {
         using Solver::Solver;   
         ~Relocate();
 
-        void solve();
         void solve(GapSolution solution);
         void perform_relocation(int tries);
-    
+        GapSolution single_relocation(int v, int d, GapSolution sol);
+        void local_search();
+
     private:
         int get_mejor_deposito(int j);
 };

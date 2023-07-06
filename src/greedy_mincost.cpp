@@ -11,26 +11,10 @@ void GreedyMinCost::solve(){
     for (int j = 0; j < this->_instance.n(); j++) {
         int deposito = this->get_mejor_deposito(j);
         
-        //std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
-
-        if (deposito == -1) {
-            double demanda_maxima_vj = 0;
-
-            for (int i = 0; i < this->_instance.m(); i++){
-                double c_dem = this->_instance.demanda(i, j);
-                if (c_dem > demanda_maxima_vj){
-                    demanda_maxima_vj = c_dem;
-                }
-            }
-            this->_cost += 3 * demanda_maxima_vj;
-        }
-        else{
+        // std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
+        if (deposito != -1) 
             this->_solution.asignar_deposito_a_vendedor(deposito, j);
-            this->_cost += this->_instance.cost(deposito, j);
-        }
     }
-
-    this->_solution.set_cost(this->_cost);
     auto end = std::chrono::steady_clock::now();
     this->_solution_time = std::chrono::duration<double, std::milli>(end - start).count();
 

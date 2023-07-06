@@ -33,6 +33,13 @@ double GapInstance::demanda(int i, int j) const{
 
 double GapInstance::cost(int i, int j) const{
     // Costo de asignar el vendedor j al depósito i
+    if (i == -1){
+        double max_cost = 0;
+        for (int k = 0; k < this->_m; k++){
+            max_cost = std::max(max_cost, this->_cost[k][j]);
+        }
+        return max_cost * 3;
+    }
     return this->_cost[i][j];
 }
 

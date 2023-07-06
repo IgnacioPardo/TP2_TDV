@@ -7,14 +7,15 @@ GapSolution::GapSolution() {
     this->_time = 0;
 }
 
-GapSolution::GapSolution(int n, int m) {
-    this->_n = n;
-    this->_m = m;
+GapSolution::GapSolution(GapInstance instance) {
+    this->_instance = instance;
+    this->_n = instance.n();
+    this->_m = instance.m();
     this->_cost = 0;
     this->_time = 0;
 
-    this->_deposito_asignado_a_vendedor = std::vector<int>(n, -1);
-    this->_vendedores_asignados_a_deposito = std::vector<std::set<int>>(m);
+    this->_deposito_asignado_a_vendedor = std::vector<int>(this->_n, -1);
+    this->_vendedores_asignados_a_deposito = std::vector<std::set<int>>(this->_m);
 }
 
 GapSolution::~GapSolution() {}
@@ -31,6 +32,7 @@ int GapSolution::m() const {
 
 int GapSolution::deposito_asignado_al_vendedor(int j) const {
     // Depósito asignado al vendedor j
+    // Complejidad: O(1)
     return this->_deposito_asignado_a_vendedor[j];
 }
 
@@ -43,9 +45,35 @@ std::vector<int> GapSolution::vendedores_asignados_al_deposito(int i) const {
     return vendedores_asignados;
 }
 
+void GapSolution::_calc_cost() {
+    // Costo total de la solución
+
+    double calculated_cost = 0;
+
+    for (int i = 0; i < this->_n; i++)
+    {
+        int j = this->_deposito_asignado_a_vendedor[i];
+
+        calculated_cost += this->_instance.cost(j, i);
+    }
+
+    this->_cost = calculated_cost;
+}
+
 double GapSolution::cost() const {
     // Costo total de la solución
-    return this->_cost;
+    // return this->_cost;
+
+    double calculated_cost = 0;
+
+    for (int i = 0; i < this->_n; i++)
+    {
+        int j = this->_deposito_asignado_a_vendedor[i];
+
+        calculated_cost += this->_instance.cost(j, i);
+    }
+
+    return calculated_cost;
 }
 
 void GapSolution::asignar_deposito_a_vendedor(int i, int j) {
@@ -53,6 +81,8 @@ void GapSolution::asignar_deposito_a_vendedor(int i, int j) {
     
     this->_deposito_asignado_a_vendedor[j] = i;
     this->_vendedores_asignados_a_deposito[i].insert(j);
+
+    // this->_calc_cost();
 
 }
 
@@ -66,6 +96,8 @@ void GapSolution::desasignar_deposito_de_vendedor(int i, int j) {
     if (it != this->_vendedores_asignados_a_deposito[i].end()){
         this->_vendedores_asignados_a_deposito[i].erase(it);
     }
+
+    // this->_calc_cost();
 }
 
 
@@ -81,11 +113,6 @@ void GapSolution::set_m(int m) {
     this->_vendedores_asignados_a_deposito = std::vector<std::set<int>>(m);
 }
 
-void GapSolution::set_cost(int cost) {
-    // Set costo total de la solución
-    this->_cost = cost;
-}
-
 void GapSolution::set_time(double time) {
     // Set tiempo en resolver el problema
     this->_time = time;
@@ -96,16 +123,24 @@ double GapSolution::time() const {
     return this->_time;
 }
 
+std::vector<int> GapSolution::unassigned_vendors() const {
+    std::vector<int> unassigned_vendors_vec;
+    for (int i = 0; i < this->_n; i++)
+    {
+        if (this->_deposito_asignado_a_vendedor[i] == -1)
+        {
+            unassigned_vendors_vec.push_back(i);
+        }
+    }
+    return unassigned_vendors_vec;
+}
+
 std::ostream& operator<<(std::ostream& os, const GapSolution& solution){
 
     os << "Cantidad de vendedores (n): " << solution.n() << std::endl;
     os << "Cantidad de depositos (m): " << solution.m() << std::endl;
     os << "Cost: " << solution.cost() << std::endl;
     os << "Time: " << solution.time() << std::endl;
-
-    /* for (int i = 0; i < solution.n(); i++) {
-        os << "vendedor " << i << " -> deposito " << solution.deposito_asignado_al_vendedor(i) << std::endl;
-    } */
 
     for (int i = 0; i < solution.m(); i++) {
         os << "deposito " << i << " -> ";
@@ -115,5 +150,50 @@ std::ostream& operator<<(std::ostream& os, const GapSolution& solution){
         os << std::endl;
     }
 
+    std::cout << "Sin asignar: ";
+    for (int i : solution.unassigned_vendors()) {
+        std::cout << i << " ";
+    }
+
     return os;
+}
+
+// Comparación de soluciones
+
+bool GapSolution::operator<(const GapSolution& other) const {
+    return this->cost() < other.cost();
+}
+
+bool GapSolution::operator>(const GapSolution& other) const {
+    return this->cost() > other.cost();
+}
+
+bool GapSolution::operator==(const GapSolution& other) const {
+    return this->cost() == other.cost();
+}
+
+bool GapSolution::operator!=(const GapSolution& other) const {
+    return this->cost() != other.cost();
+}
+
+bool GapSolution::operator<=(const GapSolution& other) const {
+    return this->cost() <= other.cost();
+}
+
+bool GapSolution::operator>=(const GapSolution& other) const {
+    return this->cost() >= other.cost();
+}
+
+// Copia de solucións
+
+GapSolution GapSolution::copy(){
+    GapSolution solution(this->_instance);
+    solution.set_time(this->_time);
+    
+    for (int i = 0; i < this->_n; i++) {
+        if (this->_deposito_asignado_a_vendedor[i] != -1)
+            solution.asignar_deposito_a_vendedor(this->_deposito_asignado_a_vendedor[i], i);
+    }
+
+    return solution;
 }

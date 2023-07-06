@@ -6,11 +6,12 @@
 #include<string>
 #include<fstream>
 #include<iostream>
+#include "gap_instance.h"
 
 class GapSolution {
     public:
         GapSolution();
-        GapSolution(int n, int m);
+        GapSolution(GapInstance instance);
         ~GapSolution();
 
         // Getters
@@ -47,15 +48,27 @@ class GapSolution {
         // Set cantidad de depósitos
         void set_m(int m);
 
-        // Set costo total de la solución
-        void set_cost(int cost);
-
         // Set tiempo en resolver el problema
         void set_time(double time);
 
+        // Copy
+        GapSolution copy();
+
+        std::vector<int> unassigned_vendors() const;
+
         friend std::ostream& operator<<(std::ostream& os, const GapSolution& solution);
 
-    private:
+        bool operator<(const GapSolution& other) const;
+        bool operator>(const GapSolution& other) const;
+        bool operator==(const GapSolution& other) const;
+        bool operator!=(const GapSolution& other) const;
+        bool operator<=(const GapSolution& other) const;
+        bool operator>=(const GapSolution& other) const;
+
+    private :
+        // Instancia
+        GapInstance _instance;
+
         // Cantidad de vendedores
         int _n;
 
@@ -64,6 +77,8 @@ class GapSolution {
 
         // Costo total de la solución
         double _cost;
+
+        void _calc_cost();
 
         // Deposito asignado al vendedor j
         std::vector<int> _deposito_asignado_a_vendedor;

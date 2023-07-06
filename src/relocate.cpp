@@ -4,30 +4,18 @@
 #include "swap.h"
 #include <random>
 
-Relocate::~Relocate() {}
+std::string time_format_(double time)
+{
+    int hours = time / 3600;
+    int minutes = (time - hours * 3600) / 60;
+    int seconds = time - hours * 3600 - minutes * 60;
 
-void Relocate::solve(){
-    auto start = std::chrono::steady_clock::now();
+    std::string time_str = std::to_string(hours) + ":" + std::to_string(minutes) + ":" + std::to_string(seconds);
 
-    // GreedyMinCost greedy(this->_instance);
-    // greedy.solve();
-    // GapSolution solution = greedy.get_solution();
-
-    BinPacking binpacking(this->_instance);
-    binpacking.solve();
-    GapSolution solution = binpacking.get_solution();
-
-    this->_solution = solution;
-    this->_solution_time = solution.time();
-
-    for (int i = 0; i < 10; i++){
-        this->perform_relocation(1000);
-    }
-
-    auto end = std::chrono::steady_clock::now();
-    this->_solution_time += std::chrono::duration<double, std::milli>(end - start).count();
-    this->_solution.set_time(this->_solution_time);
+    return time_str;
 }
+
+Relocate::~Relocate() {}
 
 void Relocate::solve(GapSolution solution){
     auto start = std::chrono::steady_clock::now();
@@ -35,9 +23,7 @@ void Relocate::solve(GapSolution solution){
     this->_solution = solution;
     this->_solution_time = solution.time();
 
-    for (int i = 0; i < 10; i++){
-        this->perform_relocation(10);
-    }
+    this->local_search();
 
     auto end = std::chrono::steady_clock::now();
     this->_solution_time += std::chrono::duration<double, std::milli>(end - start).count();
@@ -93,9 +79,6 @@ void Relocate::perform_relocation(int tries = 1000){
                     // Asigna el deposito nuevo al vendedor
                     this->_solution.asignar_deposito_a_vendedor(i, v);
 
-                    //this->_solution = solution;
-                    this->_solution.set_cost(partial_cost);
-
                     // Resetea la cantidad de iteraciones sin mejora
                     it_sin_mejora = 0;
                 }
@@ -104,4 +87,75 @@ void Relocate::perform_relocation(int tries = 1000){
         v_aux = v;
         it_sin_mejora++;
     }
+}
+
+void Relocate::local_search(){
+
+    double prev_cost = 0;
+
+    while (this->_solution.cost() < prev_cost || prev_cost == 0)
+    {
+        
+        std::vector<std::tuple<GapSolution, int>> neighbours_w_cost = std::vector<std::tuple<GapSolution, int>>();
+        
+        int max_cant = this->_instance.n() * this->_instance.m();
+        int progress = 0;
+        // timer
+        auto start = std::chrono::steady_clock::now();
+
+        // O(n*m)
+        for (int v = 0; v < this->_solution.n(); v++){
+            for (int d = 0; d < this->_solution.m(); d++){
+                progress++;
+
+                // erase line
+                std::cout << "\033[A\033[2K";
+
+                // print progress with timer and ETA
+                std::cout << "Progress: " << progress << "/" << max_cant << " ";
+                std::cout << time_format_(std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count() / 1000);
+                std::cout << "/" << time_format_(std::chrono::duration<double, std::milli>((std::chrono::steady_clock::now() - start) / progress * (max_cant - progress)).count() / 1000);
+                std::cout << std::endl;
+
+                if (this->_solution.deposito_asignado_al_vendedor(v) == d)
+                    continue;
+
+                GapSolution neighbour = this->single_relocation(v, d, this->_solution);
+
+                if (neighbour.cost() < this->_solution.cost())
+                    neighbours_w_cost.push_back(std::make_tuple(neighbour, neighbour.cost()));
+            }
+        }
+
+        if (neighbours_w_cost.size() > 0)
+        {
+            std::sort(neighbours_w_cost.begin(), neighbours_w_cost.end(), [](const std::tuple<GapSolution, int> &a, const std::tuple<GapSolution, int> &b) {
+                return std::get<1>(a) < std::get<1>(b);
+            });
+
+            // Cantidad de vecinos
+
+            std::cout << "# Neighbours: " << neighbours_w_cost.size() << std::endl << std::endl;
+
+            prev_cost = this->_solution.cost();
+            this->_solution = std::get<0>(neighbours_w_cost[0]);
+        }
+        else
+        {
+            break;
+        }
+        
+    }
+}
+
+GapSolution Relocate::single_relocation(int v, int d, GapSolution sol){
+
+    GapSolution new_sol = sol.copy();
+
+    // Si hay capacidad en el deposito para el vendedor lo reubico
+    if (this->get_capacidad_deposito(d) > this->_instance.demanda(d, v)){
+        new_sol.desasignar_deposito_de_vendedor(new_sol.deposito_asignado_al_vendedor(v), v);
+        new_sol.asignar_deposito_a_vendedor(d, v);
+    }
+    return new_sol;
 }

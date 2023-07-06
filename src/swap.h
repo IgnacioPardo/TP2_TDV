@@ -11,11 +11,13 @@ class Swap : public Solver {
         using Solver::Solver;   
         ~Swap();
 
-        void solve();
         void solve(GapSolution solution);
+        void local_search();
         void perform_swap();
-    
-    private:
+        GapSolution single_swap(int v1, int v2, GapSolution sol);
+        GapSolution swap_over_unasigned(int va, int vu, GapSolution sol);
+
+    private: 
         int get_mejor_deposito(int j);
 };
 

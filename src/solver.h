@@ -34,9 +34,6 @@ class Solver {
         GapSolution _solution;
         int _status;
 
-        // Cost
-        double _cost;
-
         // Solution Time
         double _solution_time;
 };
