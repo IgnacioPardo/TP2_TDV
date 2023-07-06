@@ -68,13 +68,20 @@ void Meta::solve() {
             return std::get<4>(a) < std::get<4>(b);
         });
 
-        std::uniform_int_distribution<> tabu_dis(0, std::min(10, (int)tabu_neighbours.size() - 1));
+        // std::uniform_int_distribution<> tabu_dis(0, std::min(10, (int)tabu_neighbours.size() - 1));
 
-        int random_index = tabu_dis(gen);
+        int random_index = 0;//tabu_dis(gen);
 
         // std::cout << "Random Neighbour: " << random_index << std::endl;
 
         std::tuple<int, int, int, int, double> best_swap = tabu_neighbours[random_index];
+
+        // if error is less than 40% of the best solution, continue
+        if (std::get<4>(best_swap) - this->_solution.cost() > 0.4 * this->_solution.cost()) {
+            // std::cout << "Best Swap: " << std::get<4>(best_swap) << std::endl;
+            max_iter--;
+            continue;
+        }
 
         int v1 = std::get<0>(best_swap);
         int v2 = std::get<1>(best_swap);
