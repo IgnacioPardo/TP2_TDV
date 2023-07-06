@@ -150,10 +150,10 @@ void results_to_csv(){
 
 void tester(){
     // std::string filename = "instances/gap/gap_a/a05100";
-    std::string filename = "instances/gap/gap_b/b10200";
+    // std::string filename = "instances/gap/gap_b/b10200";
     // std::string filename = "instances/gap/gap_b/b05100";
     // std::string filename = "instances/gap/gap_e/e801600";
-    // std::string filename = "instances/real/real_instance";
+    std::string filename = "instances/real/real_instance";
 
     std::cout << "Reading file " << filename << std::endl;
 
@@ -247,36 +247,36 @@ void tester(){
 
     // --------------------------------  RELOCATE SWAP GREEDY LOCAL SOLUTION ---------------------------------------------------------------
 
-    Relocate relocate_swap_g(instance);
+    // Relocate relocate_swap_g(instance);
 
-    relocate_swap_g.solve(swap_g_solution.copy());
+    // relocate_swap_g.solve(swap_g_solution.copy());
 
-    GapSolution relocate_swap_g_solution = relocate_swap_g.get_solution();
+    // GapSolution relocate_swap_g_solution = relocate_swap_g.get_solution();
 
-    std::cout << "Relocate (Swap (Greedy)) solution cost: " << relocate_swap_g_solution.cost() << std::endl;
-    std::cout << "Relocate (Swap (Greedy)) solution time: " << relocate_swap_g_solution.time() << std::endl;
+    // std::cout << "Relocate (Swap (Greedy)) solution cost: " << relocate_swap_g_solution.cost() << std::endl;
+    // std::cout << "Relocate (Swap (Greedy)) solution time: " << relocate_swap_g_solution.time() << std::endl;
 
     // --------------------------------  SWAP RELOCATE GREEDY LOCAL SOLUTION ---------------------------------------------------------------
 
-    Swap swap_relocate_g(instance);
+    // Swap swap_relocate_g(instance);
 
-    swap_relocate_g.solve(relocate_greedy_solution.copy());
+    // swap_relocate_g.solve(relocate_greedy_solution.copy());
 
-    GapSolution swap_relocate_g_solution = swap_relocate_g.get_solution();
+    // GapSolution swap_relocate_g_solution = swap_relocate_g.get_solution();
 
-    std::cout << "Swap (Relocate (Greedy)) solution cost: " << swap_relocate_g_solution.cost() << std::endl;
-    std::cout << "Swap (Relocate (Greedy)) solution time: " << swap_relocate_g_solution.time() << std::endl;
+    // std::cout << "Swap (Relocate (Greedy)) solution cost: " << swap_relocate_g_solution.cost() << std::endl;
+    // std::cout << "Swap (Relocate (Greedy)) solution time: " << swap_relocate_g_solution.time() << std::endl;
 
     // -------- ------------------------  RELOCATE SWAP RELOCATE SWAP GREEDY LOCAL SOLUTION ------------------------------------------------------
 
-    Relocate relocate_swap_relocate_swap_g(instance);
+    // Relocate relocate_swap_relocate_swap_g(instance);
 
-    relocate_swap_relocate_swap_g.solve(swap_relocate_g_solution.copy());
+    // relocate_swap_relocate_swap_g.solve(swap_relocate_g_solution.copy());
 
-    GapSolution relocate_swap_relocate_swap_g_solution = relocate_swap_relocate_swap_g.get_solution();
+    // GapSolution relocate_swap_relocate_swap_g_solution = relocate_swap_relocate_swap_g.get_solution();
 
-    std::cout << "Relocate (Swap (Relocate (Swap))) solution cost: " << relocate_swap_relocate_swap_g_solution.cost() << std::endl;
-    std::cout << "Relocate (Swap (Relocate (Swap))) solution time: " << relocate_swap_relocate_swap_g_solution.time() << std::endl;
+    // std::cout << "Relocate (Swap (Relocate (Swap))) solution cost: " << relocate_swap_relocate_swap_g_solution.cost() << std::endl;
+    // std::cout << "Relocate (Swap (Relocate (Swap))) solution time: " << relocate_swap_relocate_swap_g_solution.time() << std::endl;
 
 
     // --------------------------------  META ---------------------------------------------------------------
@@ -293,9 +293,9 @@ void tester(){
 
 int main(int argc, char** argv) {
 
-    results_to_csv();
+    // results_to_csv();
 
-    // tester();
+    tester();
 
     // routine();
 

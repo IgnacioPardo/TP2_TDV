@@ -42,15 +42,22 @@ void RandomDestroyer::perform_destruction(){
         int v = dis2(gen);
 
         // Deposito aleatorio
-        std::uniform_int_distribution<> dis3(0, this->_instance.m() - 1);
+        std::uniform_int_distribution<> dis3(-1, this->_instance.m() - 1);
         int d = dis3(gen);
 
+        int prev_d = this->_solution.deposito_asignado_al_vendedor(v);
+        if (d == -1) {
+            // if (prev_d != -1)
+                // this->_solution.desasignar_deposito_de_vendedor(prev_d, v);
+            continue;
+        }
+
         // Si el cliente no esta asignado al deposito
-        if (this->_solution.deposito_asignado_al_vendedor(v) != d) {
+        if (prev_d != d) {
             // Si el deposito tiene capacidad para el cliente
             if (this->_solution.capacidad_actual_deposito(d) >= this->_instance.demanda(d, v)) {
                 // Si el cliente esta asignado a otro deposito
-                if (this->_solution.deposito_asignado_al_vendedor(v) != -1) {
+                if (prev_d != -1) {
                     // Desasignar el cliente del deposito
                     this->_solution.desasignar_deposito_de_vendedor(d, v);
                 }
