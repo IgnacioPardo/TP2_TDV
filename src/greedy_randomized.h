@@ -15,7 +15,6 @@ class GreedyRandomized : public GreedyMinCost {
         void solve() override;
 
         virtual std::string get_name() const override;
-    
 };
 
 #endif // GREEDY_RANDOMIZED_H

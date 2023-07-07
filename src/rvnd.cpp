@@ -31,7 +31,12 @@ void RVND::solve(){
 
     int its = 10;
 
-    for (int i = 0; i < 1; i++){
+    int i = 0;
+
+    while (true){
+
+        auto now = std::chrono::high_resolution_clock::now();
+        std::cout << "Iteracion: " << i << " Last Cost: " << sol.cost() << " Best Costo: " << best_cost << " Tiempo: " << std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() << std::endl;
 
         if (i % (its/2) == 0){
             // Reiniciar solucion
@@ -39,10 +44,10 @@ void RVND::solve(){
             if (i % (its) == 0){
                 // La mitad de las veces, se inicializa con BinPackingRandomized
                 BinPackingRandomized binpacking_randomized(this->_instance);
-
                 binpacking_randomized.solve();
 
                 sol = binpacking_randomized.get_solution();
+                std::cout << "BinPackingRandomized Init cost: " << sol.cost() << std::endl;
 
                 if (sol.cost() < best_cost || best_cost == 0){
                     best_cost = sol.cost();
@@ -51,9 +56,12 @@ void RVND::solve(){
             }
             else{
                 // La otra mitad de las veces, se inicializa con GreedyMinCost
-                GreedyMinCost greedy(this->_instance);
+                GreedyRandomized greedy(this->_instance);
                 greedy.solve();
+
                 sol = greedy.get_solution();
+                std::cout << "GreedyMinCost Init cost: " << sol.cost() << std::endl;
+                
                 if (sol.cost() < best_cost){
                     best_cost = sol.cost();
                     best_sol = sol;
@@ -110,6 +118,8 @@ void RVND::solve(){
             }
             v++;
         }
+
+    i++;
     }
 
     this->_solution = best_sol;

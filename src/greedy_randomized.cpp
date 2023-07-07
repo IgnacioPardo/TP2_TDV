@@ -24,8 +24,10 @@ void GreedyRandomized::solve() {
     std::vector<int> vendedores(this->_instance.n());
     std::iota(vendedores.begin(), vendedores.end(), 0);
 
-    auto rng = std::default_random_engine{};
-    std::shuffle(vendedores.begin(), vendedores.end(), rng);
+    std::random_device rd;
+    std::mt19937 g(rd());
+
+    std::shuffle(vendedores.begin(), vendedores.end(), g);
 
     for (int j : vendedores)
     {

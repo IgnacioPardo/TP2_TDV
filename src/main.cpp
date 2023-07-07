@@ -318,13 +318,32 @@ void tester(){
     std::cout << "RVND solution time: " << rvnd_solution.time() << std::endl;
 }
 
+void comp(){
+
+    std::string filename = "instances/real/real_instance";
+
+    GapInstance instance(filename);
+
+    RVND rvnd(instance);
+
+    rvnd.solve();
+
+    GapSolution rvnd_solution = rvnd.get_solution();
+    rvnd_solution.recalc_cost();
+
+    std::cout << "RVND solution cost: " << rvnd_solution.cost() << std::endl;
+    std::cout << "RVND solution time: " << rvnd_solution.time() << std::endl;
+}
+
 int main(int argc, char** argv) {
     
     // Aca empieza la magia 🪄
     
-    results_to_csv();
+    // results_to_csv();
 
     // tester();
+
+    comp();
 
     return 0;
 }
