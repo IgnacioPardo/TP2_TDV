@@ -182,16 +182,6 @@ void tester(){
 
     std::cout << std::endl;
 
-    RVND rvnd(instance);
-
-    rvnd.solve();
-
-    GapSolution rvnd_solution = rvnd.get_solution();
-    rvnd_solution.recalc_cost();
-
-    std::cout << "RVND solution cost: " << rvnd_solution.cost() << std::endl;
-    std::cout << "RVND solution time: " << rvnd_solution.time() << std::endl;
-
     // --------------------------------- GREEDY SOLUTION ---------------------------------------------------------------------------
 
     GreedyMinCost greedy(instance);
@@ -314,114 +304,25 @@ void tester(){
 
     std::cout << "Tabu solution cost: " << tabu_solution.cost() << std::endl;
     std::cout << "Tabu solution time: " << tabu_solution.time() << std::endl;
-}
 
-void other_Tabuheuristic(){
-    
-    std::string filename = "instances/real/real_instance";
+    // --------------------------------  RVND Greedy ---------------------------------------------------------------
 
-    std::cout << "Reading file " << filename << std::endl;
+    RVND rvnd(instance);
 
-    GapInstance instance(filename);
+    rvnd.solve();
 
-    // timer
-    auto start = std::chrono::high_resolution_clock::now();
-    
-    GapSolution sol = GapSolution(instance);
-    double best_cost = 0;
+    GapSolution rvnd_solution = rvnd.get_solution();
+    rvnd_solution.recalc_cost();
 
-    int its = 10;
-
-    for (int i = 0; i < 1; i++){
-        std::cout << "Iteration: " << i << " Best cost: " << best_cost << std::endl;
-        
-        if (i % (its/2) == 0){
-            std::cout << "Restart ";
-            if (i % (its) == 0){
-                std::cout << "BinPackingRandomized cost: ";
-                BinPackingRandomized binpacking_randomized(instance);
-                binpacking_randomized.solve();
-                sol = binpacking_randomized.get_solution();
-                if (sol.cost() < best_cost || best_cost == 0){
-                    best_cost = sol.cost();
-                }
-                std::cout << sol.cost() << std::endl;
-            }
-            else{
-                std::cout << "GreedyMinCost cost: ";
-                GreedyMinCost greedy(instance);
-                greedy.solve();
-                sol = greedy.get_solution();
-                if (sol.cost() < best_cost){
-                    best_cost = sol.cost();
-                }
-                std::cout << sol.cost() << std::endl;
-            }
-        }
-        else if (i % (its/2) != 0){
-            std::cout << "Random Destroyer cost: ";
-            RandomDestroyer random_destroyer(instance);
-            random_destroyer.solve(sol);
-            sol = random_destroyer.get_solution();
-            std::cout << sol.cost() << std::endl;
-        }
-
-        double prev_cost = 0;
-        int v = 0;
-        while(sol.cost() < prev_cost || prev_cost == 0){
-
-            // std::cout << "Iteration: " << v++ << std::endl;
-            prev_cost = sol.cost();
-
-            Swap swap(instance);
-            swap.set_solution(sol);
-            std::vector<std::tuple<int, int, int, int, double>> swap_neighborhood = swap.neighbourhood();
-
-            if (swap_neighborhood.size() == 0){
-                break;
-            }
-
-            // ordenar por costo
-            std::sort(swap_neighborhood.begin(), swap_neighborhood.end(), [](std::tuple<int, int, int, int, double> a, std::tuple<int, int, int, int, double> b) { return std::get<4>(a) < std::get<4>(b); });
-            swap.do_swap(std::get<0>(swap_neighborhood[0]), std::get<1>(swap_neighborhood[0]), std::get<2>(swap_neighborhood[0]), std::get<3>(swap_neighborhood[0]));
-            sol = swap.get_solution();
-            Relocate relocate(instance);
-            relocate.set_solution(sol);
-            std::vector<std::tuple<int, int, double>> relocate_neighborhood = relocate.neighbourhood();
-
-            if (relocate_neighborhood.size() == 0){
-                break;
-            }
-
-            // ordenar por costo
-            std::sort(relocate_neighborhood.begin(), relocate_neighborhood.end(), [](std::tuple<int, int, double> a, std::tuple<int, int, double> b) { return std::get<2>(a) < std::get<2>(b); });
-            relocate.do_relocation(std::get<0>(relocate_neighborhood[0]), std::get<1>(relocate_neighborhood[0]));
-            sol = relocate.get_solution();
-
-            if (sol.cost() < best_cost){
-                best_cost = sol.cost();
-            }
-            v++;
-        }
-        std::cout << "Found cost: " << sol.cost() << std::endl;
-    }
-
-    std::cout << "Sol cost: " << sol.cost() << std::endl;
-
-    std::cout << "Best cost: " << best_cost << std::endl;
-
-    // timer
-    auto end = std::chrono::steady_clock::now();
-    auto time = std::chrono::duration<double, std::milli>(end - start).count();
-
-    std::cout << "Time: " << time << std::endl;
+    std::cout << "RVND solution cost: " << rvnd_solution.cost() << std::endl;
+    std::cout << "RVND solution time: " << rvnd_solution.time() << std::endl;
 }
 
 int main(int argc, char** argv) {
     
     // Aca empieza la magia 🪄
     
-    results_to_csv();
+    // results_to_csv();
 
     // tester();
 
