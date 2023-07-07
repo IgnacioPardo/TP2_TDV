@@ -10,6 +10,8 @@ abstract: |
     El problema a investigar consiste en la asignacion de cada vendedor a un depósito para que utilice regularmente buscando cumplir con las capacidades máximas de cada depósito y buscando minimizar la distancia total recorrida por los vendedores.
     Este trabajo presenta seis algoritmos distintos para resolver el problema de GAP. 
     Dos Heurísticas constructivas, dos operadores de busqueda local y dos metaheurísticas. El objetivo de este informe es el de detallar los algoritmos comparando calidad de resultados, tiempo de ejecución e implicancias prácticas en relación al problema que enfrenta la empresa ThunderPack.
+    
+    Link al repositorio: https://github.com/IgnacioPardo/TP2_TDV
 output:
   pdf_document:
     toc: yes
