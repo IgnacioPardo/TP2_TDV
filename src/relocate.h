@@ -10,9 +10,13 @@ class Relocate : public AlteringSolver {
     public:
         using AlteringSolver::AlteringSolver;   
         ~Relocate();
+        
+        void set_solution(GapSolution solution);
 
         void solve(GapSolution solution);
+        std::vector<std::tuple<int, int, double>> neighbourhood();
         std::tuple<bool, double> single_relocation(int v, int d);
+        void do_relocation(int v, int d);
         void local_search();
 
         virtual std::string get_name() const override;

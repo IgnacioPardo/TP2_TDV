@@ -31,7 +31,8 @@ void BinPackingRandomized::solve()
     {
         int deposito = this->get_mejor_deposito(j);
 
-        this->_solution.asignar_deposito_a_vendedor(deposito, j);
+        if (deposito != -1)
+            this->_solution.asignar_deposito_a_vendedor(deposito, j);
     }
 
     auto end = std::chrono::steady_clock::now();

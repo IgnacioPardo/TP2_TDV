@@ -21,7 +21,8 @@ void BinPacking::solve(){
     for (int j = 0; j < this->_instance.n(); j++) {
         int deposito = this->get_mejor_deposito(j);
         
-        this->_solution.asignar_deposito_a_vendedor(deposito, j);
+        if (deposito != -1)   
+            this->_solution.asignar_deposito_a_vendedor(deposito, j);
         
     }
 

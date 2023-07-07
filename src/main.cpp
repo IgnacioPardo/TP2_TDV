@@ -10,7 +10,12 @@
 #include "swap.h"
 #include "relocate.h"
 #include "random_destroyer.h"
-#include "meta.h"
+
+#include "tabu.h"
+#include "rvnd.h"
+
+#include "greedy_randomized.h"
+#include "binpacking_randomized.h"
 
 void results_to_csv(){
     /*
@@ -25,7 +30,7 @@ void results_to_csv(){
     std::ofstream log_file;
     std::string log_results_filename = "output/results.csv";
     log_file.open(log_results_filename, std::ios_base::app);
-    log_file << "Filename,Depositos,Vendedores,Greedy_cost,Greedy_time,Greedy_free,Binpacking_cost,Binpacking_time,Binpacking_free,Swap(Greedy)_cost,Swap(Greedy)_time,Swap(Greedy)_free,Swap(Bin Packing)_cost,Swap(Bin Packing)_time,Swap(Bin Packing)_free,Relocate(Greedy)_cost,Relocate(Greedy)_time,Relocate(Greedy)_free,Relocate(Bin Packing)_cost,Relocate(Bin Packing)_time,Relocate(Bin Packing)_free,Swap+Relocate(Greedy)_cost,Swap+Relocate(Greedy)_time,Swap+Relocate(Greedy)_free,Swap+Relocate(Bin Packing)_cost,Swap+Relocate(Bin Packing)_time,Swap+Relocate(Bin Packing)_free,Relocate+Swap(Greedy)_cost,Relocate+Swap(Greedy)_time,Relocate+Swap(Greedy)_free,Relocate+Swap(Bin Packing)_cost,Relocate+Swap(Bin Packing)_time,Relocate+Swap(Bin Packing)_free,Meta_cost,Meta_time,Meta_free" << std::endl;
+    log_file << "Filename,Depositos,Vendedores,Greedy_cost,Greedy_time,Greedy_free,Binpacking_cost,Binpacking_time,Binpacking_free,Swap(Greedy)_cost,Swap(Greedy)_time,Swap(Greedy)_free,Swap(Bin Packing)_cost,Swap(Bin Packing)_time,Swap(Bin Packing)_free,Relocate(Greedy)_cost,Relocate(Greedy)_time,Relocate(Greedy)_free,Relocate(Bin Packing)_cost,Relocate(Bin Packing)_time,Relocate(Bin Packing)_free,Swap+Relocate(Greedy)_cost,Swap+Relocate(Greedy)_time,Swap+Relocate(Greedy)_free,Swap+Relocate(Bin Packing)_cost,Swap+Relocate(Bin Packing)_time,Swap+Relocate(Bin Packing)_free,Relocate+Swap(Greedy)_cost,Relocate+Swap(Greedy)_time,Relocate+Swap(Greedy)_free,Relocate+Swap(Bin Packing)_cost,Relocate+Swap(Bin Packing)_time,Relocate+Swap(Bin Packing)_free,Tabu_cost,Tabu_time,Tabu_free,RVND_cost,RVND_time,RVND_free\n";
 
     std:: vector<std::string> index = {"gap/gap_a", "gap/gap_b", "gap/gap_e", "real"};
     
@@ -119,13 +124,21 @@ void results_to_csv(){
 
             GapSolution relocate_swap_solution_b = relocate_s_b.get_solution();
 
-            // --------------------------------------  METAHEURISTICA ------------------------------------------------------------------------
+            // --------------------------------------  TABU METAHEURISTICA ------------------------------------------------------------------------
 
-            Meta meta(instance);
+            Tabu tabu(instance);
 
-            meta.solve();
+            tabu.solve();
 
-            GapSolution meta_solution = meta.get_solution();
+            GapSolution tabu_solution = tabu.get_solution();
+
+            // --------------------------------------  RVND METAHEURISTICA ------------------------------------------------------------------------
+
+            RVND rvnd(instance);
+
+            rvnd.solve();
+
+            GapSolution rvnd_solution = rvnd.get_solution();
 
             // Split filename to get the instance name            
             std::string instance_name = filename.substr(filename.find_last_of("/") + 1);
@@ -141,7 +154,8 @@ void results_to_csv(){
             log_file << "," << swap_relocate_solution_b.cost() << "," << swap_relocate_solution_b.time() << "," << swap_relocate_solution_b.unassigned_vendors().size();
             log_file << "," << relocate_swap_solution_g.cost() << "," << relocate_swap_solution_g.time() << "," << relocate_swap_solution_g.unassigned_vendors().size();
             log_file << "," << relocate_swap_solution_b.cost() << "," << relocate_swap_solution_b.time() << "," << relocate_swap_solution_b.unassigned_vendors().size();
-            log_file << "," << meta_solution.cost() << "," << meta_solution.time() << "," << meta_solution.unassigned_vendors().size();
+            log_file << "," << tabu_solution.cost() << "," << tabu_solution.time() << "," << tabu_solution.unassigned_vendors().size();
+            log_file << "," << rvnd_solution.cost() << "," << rvnd_solution.time() << "," << rvnd_solution.unassigned_vendors().size();
             log_file << std::endl;
         }
     }
@@ -155,9 +169,9 @@ void tester(){
 
     // std::string filename = "instances/gap/gap_a/a05100";
     // std::string filename = "instances/gap/gap_b/b10200";
-    // std::string filename = "instances/gap/gap_b/b05100";
+    std::string filename = "instances/gap/gap_b/b05100";
     // std::string filename = "instances/gap/gap_e/e801600";
-    std::string filename = "instances/real/real_instance";
+    // std::string filename = "instances/real/real_instance";
 
     std::cout << "Reading file " << filename << std::endl;
 
@@ -167,6 +181,16 @@ void tester(){
     std::cout << "Depósitos: " << instance.m() << std::endl;
 
     std::cout << std::endl;
+
+    RVND rvnd(instance);
+
+    rvnd.solve();
+
+    GapSolution rvnd_solution = rvnd.get_solution();
+    rvnd_solution.recalc_cost();
+
+    std::cout << "RVND solution cost: " << rvnd_solution.cost() << std::endl;
+    std::cout << "RVND solution time: " << rvnd_solution.time() << std::endl;
 
     // --------------------------------- GREEDY SOLUTION ---------------------------------------------------------------------------
 
@@ -280,16 +304,117 @@ void tester(){
     std::cout << "Relocate (Swap (Relocate (Swap))) solution cost: " << relocate_swap_relocate_swap_g_solution.cost() << std::endl;
     std::cout << "Relocate (Swap (Relocate (Swap))) solution time: " << relocate_swap_relocate_swap_g_solution.time() << std::endl;
 
-    // --------------------------------  META ---------------------------------------------------------------
+    // --------------------------------  Tabu ---------------------------------------------------------------
 
-    Meta meta(instance);
+    Tabu tabu(instance);
 
-    meta.solve();
+    tabu.solve();
 
-    GapSolution meta_solution = meta.get_solution();
+    GapSolution tabu_solution = tabu.get_solution();
 
-    std::cout << "Meta solution cost: " << meta_solution.cost() << std::endl;
-    std::cout << "Meta solution time: " << meta_solution.time() << std::endl;
+    std::cout << "Tabu solution cost: " << tabu_solution.cost() << std::endl;
+    std::cout << "Tabu solution time: " << tabu_solution.time() << std::endl;
+}
+
+void other_Tabuheuristic(){
+    
+    std::string filename = "instances/real/real_instance";
+
+    std::cout << "Reading file " << filename << std::endl;
+
+    GapInstance instance(filename);
+
+    // timer
+    auto start = std::chrono::high_resolution_clock::now();
+    
+    GapSolution sol = GapSolution(instance);
+    double best_cost = 0;
+
+    int its = 10;
+
+    for (int i = 0; i < 1; i++){
+        std::cout << "Iteration: " << i << " Best cost: " << best_cost << std::endl;
+        
+        if (i % (its/2) == 0){
+            std::cout << "Restart ";
+            if (i % (its) == 0){
+                std::cout << "BinPackingRandomized cost: ";
+                BinPackingRandomized binpacking_randomized(instance);
+                binpacking_randomized.solve();
+                sol = binpacking_randomized.get_solution();
+                if (sol.cost() < best_cost || best_cost == 0){
+                    best_cost = sol.cost();
+                }
+                std::cout << sol.cost() << std::endl;
+            }
+            else{
+                std::cout << "GreedyMinCost cost: ";
+                GreedyMinCost greedy(instance);
+                greedy.solve();
+                sol = greedy.get_solution();
+                if (sol.cost() < best_cost){
+                    best_cost = sol.cost();
+                }
+                std::cout << sol.cost() << std::endl;
+            }
+        }
+        else if (i % (its/2) != 0){
+            std::cout << "Random Destroyer cost: ";
+            RandomDestroyer random_destroyer(instance);
+            random_destroyer.solve(sol);
+            sol = random_destroyer.get_solution();
+            std::cout << sol.cost() << std::endl;
+        }
+
+        double prev_cost = 0;
+        int v = 0;
+        while(sol.cost() < prev_cost || prev_cost == 0){
+
+            // std::cout << "Iteration: " << v++ << std::endl;
+            prev_cost = sol.cost();
+
+            Swap swap(instance);
+            swap.set_solution(sol);
+            std::vector<std::tuple<int, int, int, int, double>> swap_neighborhood = swap.neighbourhood();
+
+            if (swap_neighborhood.size() == 0){
+                break;
+            }
+
+            // ordenar por costo
+            std::sort(swap_neighborhood.begin(), swap_neighborhood.end(), [](std::tuple<int, int, int, int, double> a, std::tuple<int, int, int, int, double> b) { return std::get<4>(a) < std::get<4>(b); });
+            swap.do_swap(std::get<0>(swap_neighborhood[0]), std::get<1>(swap_neighborhood[0]), std::get<2>(swap_neighborhood[0]), std::get<3>(swap_neighborhood[0]));
+            sol = swap.get_solution();
+            Relocate relocate(instance);
+            relocate.set_solution(sol);
+            std::vector<std::tuple<int, int, double>> relocate_neighborhood = relocate.neighbourhood();
+
+            if (relocate_neighborhood.size() == 0){
+                break;
+            }
+
+            // ordenar por costo
+            std::sort(relocate_neighborhood.begin(), relocate_neighborhood.end(), [](std::tuple<int, int, double> a, std::tuple<int, int, double> b) { return std::get<2>(a) < std::get<2>(b); });
+            relocate.do_relocation(std::get<0>(relocate_neighborhood[0]), std::get<1>(relocate_neighborhood[0]));
+            sol = relocate.get_solution();
+
+            if (sol.cost() < best_cost){
+                best_cost = sol.cost();
+            }
+            v++;
+        }
+        std::cout << "Found cost: " << sol.cost() << std::endl;
+    }
+
+    std::cout << "Sol cost: " << sol.cost() << std::endl;
+
+    std::cout << "Best cost: " << best_cost << std::endl;
+
+    // timer
+    auto end = std::chrono::steady_clock::now();
+    auto time = std::chrono::duration<double, std::milli>(end - start).count();
+
+    std::cout << "Time: " << time << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -299,6 +424,8 @@ int main(int argc, char** argv) {
     results_to_csv();
 
     // tester();
+
+    // other_Tabuheuristic();
 
     return 0;
 }

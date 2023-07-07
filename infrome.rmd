@@ -8,8 +8,8 @@ author:
 date: "`r Sys.Date()`"
 abstract: |
     El problema a investigar consiste en la asignacion de cada vendedor a un depósito para que utilice regularmente buscando cumplir con las capacidades máximas de cada depósito y buscando minimizar la distancia total recorrida por los vendedores.
-    Este trabajo presenta cinco algoritmos distintos para resolver el problema de GAP. 
-    Dos Heurísticas constructivas, dos operadores de busqueda local y una Metaheurística. El objetivo de este informe es el de detallar los algoritmos comparando calidad de resultados, tiempo de ejecución e implicancias prácticas en relación al problema que enfrenta la empresa ThunderPack.
+    Este trabajo presenta seis algoritmos distintos para resolver el problema de GAP. 
+    Dos Heurísticas constructivas, dos operadores de busqueda local y dos metaheurísticas. El objetivo de este informe es el de detallar los algoritmos comparando calidad de resultados, tiempo de ejecución e implicancias prácticas en relación al problema que enfrenta la empresa ThunderPack.
 output:
   pdf_document:
     toc: yes
@@ -148,7 +148,7 @@ Dada una solución factible, se destruye la solución de manera aleatoria. Prime
 
 3.  Se obtiene el depósito previamente asignado al cliente.
 
-4.  Si el número generado para el depósito es -1, significa que el cliente no se asignará a ningún depósito en esta iteración y se continúa con la siguiente iteración del bucle. Existió la idea de desasignar vendedores cómo parte de la destrucción, sin embargo nos resultó muy contraproducente a la hora de explorar nuevos vecindarios.
+4.  Si el número generado para el depósito es -1, significa que el cliente no se asignará a ningún depósito en esta iteración y se continúa con la siguiente iteración del bucle. Desasignar un vendedor a un deposito se vuelve muy destructivo, por lo que implementamos la opción de activarlo pero no es el default.
 
 5.  Si el cliente no estaba previamente asignado al depósito generado:
 
@@ -160,13 +160,11 @@ Dada una solución factible, se destruye la solución de manera aleatoria. Prime
 Finalmente se habrá obtenido una nueva solución factible, que se espera
 se encuentre en un nuevo vecindario.
 
-\newpage
+## Metaheurísticas
 
-## Metaheurística
+A modo de "escapar" de los mínimos locales a los que se llega con la búsqueda local, se implementaron dos metaheurísticas que se detallan a continuación:
 
-### Busqeda Tabú sobre soluciones Golosas y Bin Packing, aleatorias y destruidas
-
-A modo de "escapar" de los mínimos locales a los que se llega con la búsqueda local, se implementó una metaheurística que consiste en losiguiente:
+### Swap Tabú Search sobre soluciones Relocate + RandomGreedy y Random BinPacking
 
 1.  Se inicializan las variables, `iter_count` (número máximo de iteraciones), `max_tries` (número máximo de reinicios), `cutoff` (límite despues de `cutoff` soluciones peores), y `neighbourhood_count` (número de vecinos a explorar en cada iteración). Y un vector llamado `solutions` para almacenar los minimos locales encontrados durante el proceso.
 
@@ -190,17 +188,50 @@ Dada la cantidad de vecindarios a descender:
 
 9. Si se supera el número máximo de iteraciones, se detiene el algoritmo.
 
+### Randomized Variable Neighbourhood Descent (RVND)
+
+1. Generar una solución inicial utilizando la heurística Random BinPacking.
+
+2. Generar el vecindario con el operador Swap.
+
+3. Setear la solución actual como la mejor solución del vecindario.
+
+4. Generar el vecindario con el operador Relocate.
+
+5. Setear la solución actual como la mejor solución del vecindario.
+
+6. Mientras la solución actual sea mejor que la mejor solución encontrada, se repiten los pasos 2-5.
+
+7. Cuando la solución actual no sea mejor que la mejor solución encontrada, se llegó a un mínimo local.
+
+8. Si el minimo local es menor que el mejor mínimo local encontrado, se actualiza el mejor mínimo local.
+
+9. Incrementar el contador de reinicios. 
+
+Si el contador de reinicios es menor que el máximo de reinicios:
+
+- Cada cierta cantidad de reinicios:
+
+- Si el reinicio es par, generar una nueva solucion inicial utilizando la heurística Random Greedy.
+- Si el reinicio es impar, generar una nueva solucion inicial utilizando la heurística Random BinPacking.
+
+- Si no se cumplió la cantidad de reinicios, destruir la solución actual utilizando la heurística Random Destroyer con la desasignación de vendedores a depósitos activada.
+
+- Repetir los pasos 2-6.
+
+Si el contador de reinicios es igual al máximo de reinicios, se detiene el algoritmo.
+
+Finalmente, se obtiene la mejor solución encontrada.
+
 \newpage
 
 # Experimentación
 
 ## Descripción de las Instancias
 
-Para la experimentación se contó con 27 instancias de prueba divididas en 3 grupos "A", "B" y "E" asi como una instancia real. Compuestas de la siguiente manera:
+Para la experimentación se contó con 27 instancias de prueba divididas en 3 grupos "A", "B" y "E" asi como una instancia real (1100 vendedores y 310 depósitos).
 
-- La instancia real cuenta con 1100 vendedores y 310 depósitos.
-
-- Las instancias "A", "B" y "E"
+- Las instancias "A", "B" y "E" estan compuestas de la siguiente manera:
 
 | Depositos a   | Vendedores a   | Depositos b   | Vendedores b   |   Depositos e |   Vendedores e |
 |:--------------|:---------------|---------------|----------------|--------------:|---------------:|
@@ -226,11 +257,11 @@ Sobre cada instancia se corrieron los siguientes algoritmos:
 
 - Heurística Greedy
 - Heurística Bin Packing
-- Swap sobre Greedy
-- Swap sobre Bin Packing
-- Relocate sobre Greedy
-- Relocate sobre Bin Packing
-- Metaheurística
+- Swap sobre Greedy y Swap sobre Bin Packing
+- Relocate sobre Greedy y Relocate sobre Bin Packing
+
+- Metaheurística Swap Tabú Search (Iteraciones: 10, #Vecinos: 10, Cutoff: 30, Reinicios: 10)
+- Metaheurística Randomized Variable Neighbourhood Descent (Exhaustiva y sin reinicios)
 
 Ademas para comparar contra la metaheurística se corrieron las siguientes combinaciones de operadores de busqueda local "encadenados":
        
@@ -254,13 +285,13 @@ La ejecución se realizó sobre una computadora con las siguientes característi
 
 ### Costos de las soluciones
 
-A diferencia del resto de las instancias, para la instancia A, la solución obtenida de forma Greedy para el orden del archivo parece ser la mejor o casi la mejor solución. En comparación con el algoritmo de Bin Packing los resultados son menores de la mitad, y al aplicarle una busqueda local la mejora es prácticamente mínima. Sin embargo al aplicarle una cadena de operadores de búsqueda local a la solución BinPacking (Relocate(Swap(BinPacking)) es cuando se logra obtener un minimo local mejor que el obtenido por la heurística Greedy. En la siguiente tabla se pueden ver algunos resultados.
+A diferencia del resto de las instancias, para la instancia A, la solución obtenida de forma Greedy para el orden del archivo parece ser la mejor o casi la mejor solución. En comparación con el algoritmo de Bin Packing los resultados son menores de la mitad, y al aplicarle una busqueda local la mejora es prácticamente mínima. Sin embargo al aplicarle una cadena de operadores de búsqueda local a la solución BinPacking (Relocate(Swap(BinPacking)) es cuando se logra obtener un minimo local mejor que el obtenido por la heurística Greedy. En la siguiente tabla se pueden ver los resultados obtenidos instancia A.
 
-| D     |V        | G        | BP          | S(G)        | S(BP)         | R(G)         |R(BP)           |   S(R(G))      |   S(R(BP))   |   R(S(G))    |    R(S(BP))  |   M   |
-|-------|---------|----------|-------------|-------------|---------------|--------------|----------------|----------------|--------------|--------------|--------------|-------|
-|     5 |     100 |     1709 |        3206 |        1700 |          1712 |         1709 |           1719 |           1700 |         1699 |         1700 |         1698 |  1700 |
-|    20 |     100 |     1170 |        2972 |        1168 |          1245 |         1170 |           1165 |           1168 |         1163 |         1167 |         1161 |  1167 |
-|    10 |     100 |     1390 |        2954 |        1367 |          1395 |         1390 |           1369 |           1367 |         1369 |         1365 |         1363 |  1365 |
+| G    | BP    | S(G)        | S(BP)         | R(G)         |R(BP)           |   S(R(G))      |   S(R(BP))   |   R(S(G))    |    R(S(BP))  |  Tabu |  RVND |
+|------|-------|-------------|---------------|--------------|----------------|----------------|--------------|--------------|--------------|-------|-------|
+| 1709 |  3206 |        1700 |          1712 |         1709 |           1719 |           1700 |         1699 |         1700 |         1698 |  1700 |  1700 |
+| 1170 |  2972 |        1168 |          1245 |         1170 |           1165 |           1168 |         1163 |         1167 |         1161 |  1167 |  1203 |
+| 1390 |  2954 |        1367 |          1395 |         1390 |           1369 |           1367 |         1369 |         1365 |         1363 |  1365 |  1367 |
 <!--
 |     5 |     200 |     3259 |        6075 |        3238 |          3258 |         3259 |           3236 |           3238 |         3235 |         3238 |         3235 |  3238 |
 |    20 |     200 |     2371 |        5855 |        2353 |          2423 |         2371 |           2357 |           2353 |         2354 |         2353 |         2345 |  2353 |
@@ -282,11 +313,12 @@ Para las instancias B y E los resultados son diferentes, aquellas soluciones que
 |Costos sobre Instancia E|
 
 \newpage
-En cuanto a la Metaheurística propuesta, a lo largo de todas las instancias en la mayoría de los casos se logra obtener una solución mejor que la obtenida por los otros algoritmos. El único resultado similar y hasta a veces mejor se obtiene a partir de encadenar el operador Relocate sobre la solución ya minimizada por el operador Swap en una solución Bin Packing (Relocate(Swap(BinPacking)). Esto es sin embargo a cuestas de un tiempo de ejecución.
+
+En cuanto a la Metaheurística Tabu, a lo largo de todas las instancias en la mayoría de los casos se logra obtener una solución mejor que la obtenida por los otros algoritmos. El único resultado similar y hasta a veces mejor se obtiene a partir de encadenar el operador Relocate sobre la solución ya minimizada por el operador Swap en una solución Bin Packing (Relocate(Swap(BinPacking)). Esto es sin embargo a cuestas de un tiempo de ejecución. Por el otro lado, la Metaheuristica RVND logra obtener soluciones aún mejores que la Metaheurística Tabu.
 
 ### Tiempo de ejecución
 
-Como era de esperarse, los tiempos de ejecución de las heuristicas constructivas son ordenes de maginitud menores que los de los operadores de búsqueda local. En el caso de la metaheurística, el tiempo de ejecución es mayor que el de las heuristicas constructivas pero menor que el de los operadores de búsqueda local pero con la ventaja de obtener una solución mejor. Salvo por el Relocate(Swap(BinPacking), aquel cuyos resultados son similares a los de la metaheurística, en los que en varios casos la metaheurística logra obtener una solución mejor en un tiempo de ejecución menor. Esto es en parte por los hyperparametros elegidos de forma arbitraria de la metaheurística.
+Como era de esperarse, los tiempos de ejecución de las heuristicas constructivas son ordenes de maginitud menores que los de los operadores de búsqueda local. En el caso de las metaheurística, el tiempo de ejecución es mayor que el de las heuristicas constructivas. En el caso de la Tabú es menor que el de los operadores de búsqueda local pero con la ventaja de obtener una solución mejor. Salvo por el Relocate(Swap(BinPacking), aquel cuyos resultados son similares a los de las metaheurística. Esto es en parte por los hyperparametros elegidos de forma arbitraria de la metaheurística y por la similitud. En la mayoría de las instancias el tiempo de ejecución de la metaheurística RVND es mayor o similar que el de la metaheurística Tabú.
 
 |![Tiempo sobre Instancia A](src/output/figures/instancia_a_tiempo.png)|
 |:--:|
@@ -304,7 +336,7 @@ Como era de esperarse, los tiempos de ejecución de las heuristicas constructiva
 
 ### Vendedores sin asignar
 
-Para las instancias "A", tanto la solución Greedy como la de BinPacking logran asignar a todos los vendedores, por lo que no hay vendedores sin asignar. Consecuentemente, los operadores locales no logran mejorar la solución ya que no hay vendedores sin asignar a los cuales reasignar. Ademas por su naturaleza, nunca descubrirían un vecindario mejor cuya cantidad de vendedores sin asignar sea mayor que cero porque su costo sería peor.
+Para las instancias "A", tanto la solución Greedy como la de BinPacking logran asignar a todos los vendedores, por lo que no hay vendedores sin asignar. Consecuentemente, los operadores locales no lograrían mejorar la solución si desasignaran a un vendedor ya que por su naturaleza, nunca descubrirían un vecindario mejor cuya cantidad de vendedores sin asignar sea mayor que cero porque su costo sería peor.
 
 <!--
 |![Libres sobre Instancia A](src/output/figures/instancia_a_unassigned.png)|
@@ -312,7 +344,7 @@ Para las instancias "A", tanto la solución Greedy como la de BinPacking logran 
 |Instancia A|
 -->
 
-Por el otro lado, en las instancias "B" y "E", la solución BinPacking logra asignar a todos los vendedores, mientras que la solución Greedy no. Es facil de ver en las figuras "Libres sobre Instancia B" y "Libres sobre Instancia E" por su carácter de "peine". No solo esto, si no que a traves de todas las instancias, la única mejora en este aspecto la presenta la cadena Relocate+Swap sobre la solución Greedy, y no es garantía. La intuición detras de esto la hayamos al pensar que la solución Greedy "bloquea" los depositos de forma tal que cuesta lograr reducir la cantidad de depositos sin asignar.
+Por el otro lado, en las instancias "B" y "E", la solución BinPacking logra asignar a todos los vendedores, mientras que la solución Greedy no. Es facil de ver en las figuras "Libres sobre Instancia B" y "Libres sobre Instancia E" por su carácter de "peine". No solo esto, si no que a traves de todas las instancias, la única mejora en este aspecto la presenta la cadena Relocate(Swap) sobre la solución Greedy, y no es garantía. La intuición detras de esto la hayamos al pensar que la solución Greedy "bloquea" los depositos de forma tal que cuesta lograr reducir la cantidad de depositos sin asignar.
 
 |![Libres sobre Instancia B](src/output/figures/instancia_b_unassigned.png)|
 |:--:|
@@ -326,24 +358,28 @@ Por el otro lado, en las instancias "B" y "E", la solución BinPacking logra asi
 
 ## Resultados sobre Instancia Real
 
-Finalmente, sobre la instancia real los resultados parecen ser bastante consistentes con los obtenidos sobre las instancias "A-B-E". La figura "Costo sobre Instancia Real" no permitía apreciar la comparación entré los costos de los algoritmos ya que la solución Bin Packing tiene un costo un orden de magnitud mayor al resto, por lo que se recorto la figura para poder apreciar mejor las diferencias. Los mejores resultados se obtienen por la encadenación de operadores de busqueda local y la metaheurística propuesta.
+Finalmente, sobre la instancia real los resultados parecen ser bastante consistentes con los obtenidos sobre las instancias "A-B-E". La figura "Costo sobre Instancia Real" no permitía apreciar la comparación entré los costos de los algoritmos ya que la solución Bin Packing tiene un costo un orden de magnitud mayor al resto, por lo que se recorto la figura para poder apreciar mejor las diferencias. Los mejores resultados se obtienen por la encadenación de operadores de busqueda local y las metaheurística propuestas. En especial la RVND, que logra obtener la mejor solución entre todos los algoritmos. Los costos de las soluciones obtenidas son:
 
-Los costos de las soluciones obtenidas son:
-
-| G        | BP          | S(G)        | S(BP)         | R(G)       |R(BP)           |  S(R(G)) | S(R(BP)) | R(S(G)) | R(S(BP))  |   M   |
-|---------:|------------------:|--------------------:|-------------------------:|------------------------:|-----------------------------:|-----------------------------:|----------------------------------:|-----------------------------:|----------------------------------:|------------:|
-|    964.9 |             10629 |               824.2 |                   1146.8 |                   794.1 |                        797.8 |                        742.1 |                             **729.8** |                        747.9 |                             764.7 |       768.3 |
+| G     | BP    | S(G)    | S(BP)  | R(G)   |R(BP)  | S(R(G)) | S(R(BP)) | R(S(G)) | R(S(BP)) | TABU  |   RVND    |
+|------:|------:|--------:|-------:|-------:|------:|--------:|---------:|--------:|---------:|------:|----------:|
+| 964.9 | 10629 |   824.2 | 1146.8 |  794.1 | 797.8 |   742.1 |  729.8   |   747.9 |    764.7 | 768.3 | **718.9** |
 
 |![Costo sobre Instancia Real](src/output/figures/instancia_real_cost.png)|
 |:--:|
 |Costo sobre Instancia Real|
 
-La figura "Tiempo sobre Instancia Real" muestra la comparación de tiempos de ejecución de los algoritmos. La metaheurística propuesta logra obtener una solución en un tiempo de ejecución menor que el de algunos otros operadores pero no todos. Esto se debe en parte a los hyperparametros elegidos de forma arbitraria para la metaheurística y en parte a la naturaleza de los operadores de búsqueda local, que al ser aplicados de forma exhaustiva, es posible encuentren una solución mejor.
+La figura "Tiempo sobre Instancia Real" muestra la comparación de tiempos de ejecución de los algoritmos. Las metaheurística propuestas aunque no es super veloz, logra obtener una solución en un tiempo de ejecución similar al de los operadores de búsqueda local. En particular, la Tabú se ejecuta en menor tiempo que la encadenación Relocate(Swap(BinPacking)).
 
 |![Tiempo sobre Instancia Real](src/output/figures/instancia_real_time.png)|
 |:--:|
 |Tiempo sobre Instancia Real|
 
+Finalmente ninguno de los algoritmos deja vendedores sin asignar.
+
 # Conclusiones
 
-En este trabajo se presentaron dos heuristicas constructivas, dos operadores de búsqueda local y una metaheurística para el problema de asignación de vendedores a depositos. Se compararon los resultados de los algoritmos sobre tres instancias de prueba y una instancia real. Los resultados obtenidos fueron consistentes con la intuición detras de los algoritmos. Las heuristicas constructivas logran obtener una solución en un tiempo de ejecución menor que los operadores de búsqueda local, pero con un costo mayor. La metaheurística propuesta logra obtener una solución mejor que los operadores de búsqueda local en un tiempo de ejecución menor que el de estos, pero mayor que el de las heuristicas constructivas. Los resultados obtenidos sobre la instancia real fueron consistentes con los obtenidos sobre las instancias de prueba.
+En este trabajo se presentaron dos heuristicas constructivas, dos operadores de búsqueda local y dos metaheurísticas para el problema de asignación de vendedores a depositos. Se compararon los resultados de los algoritmos sobre tres instancias de prueba y una instancia real. Los resultados obtenidos fueron consistentes con la intuición detras de los algoritmos. 
+
+Las heuristicas constructivas logran obtener una solución en un tiempo de ejecución menor que los operadores de búsqueda local, pero con un costo mayor. La metaheurística Tabú logra obtener una solución mejor que los operadores de búsqueda local en un tiempo de ejecución menor que el de estos en varias instancias pero es superada por la metaheurística RVND en la instancia real.
+
+Por último, los algoritmos basados en la heuristica constructiva BinPacking logran asignar a todos los vendedores en todas las instancias, mientras que los basados en la heuristica constructiva Greedy no.

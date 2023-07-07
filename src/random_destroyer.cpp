@@ -16,11 +16,18 @@ void RandomDestroyer::solve(GapSolution solution){
     *   Reasigna clientes aleatorios a depositos aleatorios una cantidad aleatoria de veces
     */
     this->_solution = solution;
-    this->_solution_time = solution.time();
+    
+    // timer
+    auto start = std::chrono::high_resolution_clock::now();
 
     this->perform_destruction();
 
     this->_solution.recalc_cost();
+
+    // timer
+    auto end = std::chrono::high_resolution_clock::now();
+    this->_solution_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    this->_solution.set_time(this->_solution_time);
 }
 
 void RandomDestroyer::perform_destruction(){
@@ -47,9 +54,8 @@ void RandomDestroyer::perform_destruction(){
 
         int prev_d = this->_solution.deposito_asignado_al_vendedor(v);
         if (d == -1) {
-            // Optamos por no desasignar el cliente del deposito ya que se volvía MUY destructivo
-            // if (prev_d != -1)
-                // this->_solution.desasignar_deposito_de_vendedor(prev_d, v);
+            if (prev_d != -1 && this->_is_unassigner)
+                this->_solution.desasignar_deposito_de_vendedor(prev_d, v);
             continue;
         }
 
@@ -67,5 +73,8 @@ void RandomDestroyer::perform_destruction(){
             }
         }
     }
+}
 
+void RandomDestroyer::set_is_unassigner(bool is_unassigner) {
+    this->_is_unassigner = is_unassigner;
 }

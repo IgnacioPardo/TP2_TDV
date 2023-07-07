@@ -29,6 +29,39 @@ void Relocate::solve(GapSolution solution){
     this->_solution.set_time(this->_solution_time);
 }
 
+std::vector<std::tuple<int, int, double>> Relocate::neighbourhood(){
+    std::vector<std::tuple<int, int, double>> relocation_w_cost = std::vector<std::tuple<int, int, double>>();
+
+    // Genero todos los vecinos
+    // O(n*m)
+    for (int v = 0; v < this->_solution.n(); v++)
+    {
+        for (int d = 0; d < this->_solution.m(); d++)
+        {
+
+            // Solución actual
+            if (this->_solution.deposito_asignado_al_vendedor(v) == d)
+                continue;
+
+            // Evaluar la factibilidad de la solución y su costo
+            std::tuple<bool, double> relocation = this->single_relocation(v, d);
+
+            // Si la solución es factible
+            if (std::get<0>(relocation))
+            {
+                // Si la solución es mejor que la actual
+                if (std::get<1>(relocation) < this->_solution.cost())
+                {
+                    // Agrego la solución a la lista de vecinos
+                    relocation_w_cost.push_back(std::make_tuple(v, d, std::get<1>(relocation)));
+                }
+            }
+        }
+    }
+
+    return relocation_w_cost;
+}
+
 void Relocate::local_search(){
     /*
     *  Genera los vecinos de la solución actual y se queda con el mejor.
@@ -40,38 +73,14 @@ void Relocate::local_search(){
 
     while (this->_solution.cost() < prev_cost || prev_cost == 0)
     {
-        
-        std::vector<std::tuple<int, int, int>> relocation_w_cost = std::vector<std::tuple<int, int, int>>();
 
-        // Genero todos los vecinos
-        // O(n*m)
-        for (int v = 0; v < this->_solution.n(); v++){
-            for (int d = 0; d < this->_solution.m(); d++){
-
-                // Solución actual
-                if (this->_solution.deposito_asignado_al_vendedor(v) == d)
-                    continue;
-
-                // Evaluar la factibilidad de la solución y su costo
-                std::tuple<bool, double> relocation = this->single_relocation(v, d);
-
-                // Si la solución es factible
-                if (std::get<0>(relocation))
-                {
-                    // Si la solución es mejor que la actual
-                    if (std::get<1>(relocation) < this->_solution.cost()){
-                        // Agrego la solución a la lista de vecinos
-                        relocation_w_cost.push_back(std::make_tuple(v, d, std::get<1>(relocation)));
-                    }
-                }
-            }
-        }
+        std::vector<std::tuple<int, int, double>> neighbours = this->neighbourhood();
 
         // Si hay vecinos
-        if (relocation_w_cost.size() > 0)
+        if (neighbours.size() > 0)
         {
             // Ordeno los vecinos por costo
-            std::sort(relocation_w_cost.begin(), relocation_w_cost.end(), [](std::tuple<int, int, int> a, std::tuple<int, int, int> b) {
+            std::sort(neighbours.begin(), neighbours.end(), [](std::tuple<int, int, int> a, std::tuple<int, int, int> b) {
                 return std::get<2>(a) < std::get<2>(b);
             });
 
@@ -79,22 +88,17 @@ void Relocate::local_search(){
             prev_cost = this->_solution.cost();
             
             // Elijo el mejor vecino
-            std::tuple<int, int, int> best_relocation = relocation_w_cost[0];
+            std::tuple<int, int, double> best_relocation = neighbours[0];
 
             int v = std::get<0>(best_relocation);
             int d = std::get<1>(best_relocation);
 
             double best_cost = std::get<2>(best_relocation);
 
+            // Realizo la reubicación
+            this->do_relocation(v, d);
 
-            int prev_d = this->_solution.deposito_asignado_al_vendedor(v);
-
-            if (prev_d != -1)
-                this->_solution.desasignar_deposito_de_vendedor(prev_d, v);
-
-            this->_solution.asignar_deposito_a_vendedor(d, v);
-
-            this->_solution.recalc_cost(); // Es O(n*m), pero nos pareció necesario para mantener la consistencia de la solución
+            this->_solution.set_cost(best_cost);
         }
         else
         {
@@ -102,6 +106,20 @@ void Relocate::local_search(){
         }
         
     }
+}
+
+void Relocate::do_relocation(int v, int d){
+    /*
+    *  Realiza la reubicación de un vendedor a un depósito.
+    *  La solución pasada por parámetro es la solución inicial debe ser una solución factible.
+    */
+
+    int prev_d = this->_solution.deposito_asignado_al_vendedor(v);
+
+    if (prev_d != -1)
+        this->_solution.desasignar_deposito_de_vendedor(prev_d, v);
+
+    this->_solution.asignar_deposito_a_vendedor(d, v);
 }
 
 std::tuple<bool, double> Relocate::single_relocation(int v, int d){
@@ -117,4 +135,10 @@ std::tuple<bool, double> Relocate::single_relocation(int v, int d){
         return std::make_tuple(true, new_cost);
     }
     return std::make_tuple(false, 0);
+}
+
+void Relocate::set_solution(GapSolution solution)
+{
+    // Actualiza la solución actual.
+    this->_solution = solution;
 }
