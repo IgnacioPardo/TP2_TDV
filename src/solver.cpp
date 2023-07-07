@@ -31,11 +31,13 @@ std::string Solver::get_name() const {
 }
 
 void Solver::set_instance(GapInstance instance) {
+    /*
+    *   Setea la instancia a resolver.
+    */
     this->_instance = instance;
     this->_instance_loaded = true;
 
-    this->_solution.set_n(instance.n());
-    this->_solution.set_m(instance.m());
+    this->_solution = GapSolution(instance);
 }
 
 double Solver::get_cost() const

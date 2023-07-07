@@ -75,26 +75,21 @@ void Swap::local_search(){
 
     double prev_cost = 0;
     
+    // Best Improvement
     while (this->_solution.cost() < prev_cost || prev_cost == 0){
         
-        // std::cout << "New Solution" << std::endl;
-
         std::vector<std::tuple<int, int, int, int, double>> neighbours = this->neighbourhood();
         
         if (neighbours.size() > 0)
         {   
-            // std::cout << "# Neigh: " << neighbours.size() << std::endl;
 
-            // sort neighbours by cost
+            // Ordeno los vecinos por costo
             std::sort(neighbours.begin(), neighbours.end(), [](std::tuple<int, int, int, int, double> a, std::tuple<int, int, int, int, double> b) {
                 return std::get<4>(a) < std::get<4>(b);
             });
 
-            // std::cout << "Sorted" << std::endl;
 
             prev_cost = this->_solution.cost();
-            // std::cout << "Prev Cost: " << prev_cost << std::endl;
-            // perform swap
 
             std::tuple<int, int, int, int, double> best_swap = neighbours[0];
 
@@ -103,20 +98,11 @@ void Swap::local_search(){
             int d1 = std::get<2>(best_swap);
             int d2 = std::get<3>(best_swap);
 
-            // std::cout << "Best Swap v1: " << v1 << " v2: " << v2 << " d1: " << d1 << " d2: " << d2 << std::endl;
-            // std::cout << "i costs: " << this->_instance.cost(d1, v1) << " " << this->_instance.cost(d2, v2) << std::endl;
-            // std::cout << "f costs: " << this->_instance.cost(d2, v1) << " " << this->_instance.cost(d1, v2) << std::endl;
-            // std::cout << "Better Cost: " << std::get<4>(best_swap) << std::endl;
-
             this->do_swap(v1, v2, d1, d2);
             
             double best_cost = std::get<4>(best_swap);
             this->_solution.set_cost(best_cost);
-            // this->_solution.recalc_cost();
 
-            // std::cout << "New Cost: " << this->_solution.cost() << std::endl;
-            
-            // std::cout << std::endl;
         }
         else
         {
@@ -129,18 +115,15 @@ void Swap::do_swap(int v1, int v2, int d1, int d2){
     /*
     *   Realiza el intercambio de depósitos entre dos vendedores.
     */
-
-    // this->_solution.set_cost(0);
-    // // std::cout << "Doing swap" << std::endl;
-
-    if (d1 == -1){
-        // std::cout << "d1 == -1" << std::endl;
+    if (d1 == -1 && d2 == -1){
+        return;
+    }
+    else if (d1 == -1){
         this->_solution.desasignar_deposito_de_vendedor(d2, v2);
         this->_solution.asignar_deposito_a_vendedor(d2, v1);
         return;
     }
     else if (d2 == -1){
-        // std::cout << "d2 == -1" << std::endl;
         this->_solution.desasignar_deposito_de_vendedor(d1, v1);
         this->_solution.asignar_deposito_a_vendedor(d1, v2);
         return;

@@ -12,8 +12,9 @@ std::string BinPackingRandomized::get_name() const {
 void BinPackingRandomized::solve()
 {
     /*
-     *   A cada vendedor j le asigno el deposito i cuya capacidad al restarle la demanda del vendedor j sea la menor
-     */
+    *   Para cada vendedor j en orden aleatorio
+    *   Le asigno el deposito i cuya capacidad al restarle la demanda del vendedor j sea la menor
+    */
 
     auto start = std::chrono::steady_clock::now();
 
@@ -29,8 +30,6 @@ void BinPackingRandomized::solve()
     for (int j : vendedores)
     {
         int deposito = this->get_mejor_deposito(j);
-
-        // std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
 
         this->_solution.asignar_deposito_a_vendedor(deposito, j);
     }

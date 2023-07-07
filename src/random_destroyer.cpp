@@ -47,6 +47,7 @@ void RandomDestroyer::perform_destruction(){
 
         int prev_d = this->_solution.deposito_asignado_al_vendedor(v);
         if (d == -1) {
+            // Optamos por no desasignar el cliente del deposito ya que se volvía MUY destructivo
             // if (prev_d != -1)
                 // this->_solution.desasignar_deposito_de_vendedor(prev_d, v);
             continue;

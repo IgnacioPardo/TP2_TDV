@@ -149,6 +149,10 @@ void results_to_csv(){
 }
 
 void tester(){
+    /*
+    *   Tester para probar las heurísticas
+    */
+
     // std::string filename = "instances/gap/gap_a/a05100";
     // std::string filename = "instances/gap/gap_b/b10200";
     // std::string filename = "instances/gap/gap_b/b05100";
@@ -156,8 +160,6 @@ void tester(){
     std::string filename = "instances/real/real_instance";
 
     std::cout << "Reading file " << filename << std::endl;
-
-    // Aca empieza la magia 🪄
 
     GapInstance instance(filename);
 
@@ -208,7 +210,7 @@ void tester(){
 
     // --------------------------------  SWAP BIN PACKING LOCAL SOLUTION ------------------------------------------------------------------------
 
-    /* Swap swap_bp(instance);
+    Swap swap_bp(instance);
 
     swap_bp.solve(binpacking_solution.copy());
 
@@ -217,7 +219,7 @@ void tester(){
     std::cout << "Swap (Bin Packing) solution cost: " << swap_bp_solution.cost() << std::endl;
     std::cout << "Swap (Bin Packing) solution time: " << swap_bp_solution.time() << std::endl;
 
-    std::cout << std::endl; */
+    std::cout << std::endl;
 
     // --------------------------------  RELOCATE GREEDY LOCAL SOLUTION -------------------------------------------------------------------
 
@@ -234,50 +236,49 @@ void tester(){
 
     // --------------------------------  RELOCATE BIN PACKING LOCAL SOLUTION -------------------------------------------------------------------
 
-    // Relocate relocate_bp(instance);
+    Relocate relocate_bp(instance);
 
-    // relocate_bp.solve(binpacking_solution.copy());
+    relocate_bp.solve(binpacking_solution.copy());
 
-    // GapSolution relocate_binpacking_solution = relocate_bp.get_solution();
+    GapSolution relocate_binpacking_solution = relocate_bp.get_solution();
 
-    // std::cout << "Relocate (Bin Packing) solution cost: " << relocate_binpacking_solution.cost() << std::endl;
-    // std::cout << "Relocate (Bin Packing) solution time: " << relocate_binpacking_solution.time() << std::endl;
+    std::cout << "Relocate (Bin Packing) solution cost: " << relocate_binpacking_solution.cost() << std::endl;
+    std::cout << "Relocate (Bin Packing) solution time: " << relocate_binpacking_solution.time() << std::endl;
 
-    // std::cout << std::endl;
+    std::cout << std::endl;
 
     // --------------------------------  RELOCATE SWAP GREEDY LOCAL SOLUTION ---------------------------------------------------------------
 
-    // Relocate relocate_swap_g(instance);
+    Relocate relocate_swap_g(instance);
 
-    // relocate_swap_g.solve(swap_g_solution.copy());
+    relocate_swap_g.solve(swap_g_solution.copy());
 
-    // GapSolution relocate_swap_g_solution = relocate_swap_g.get_solution();
+    GapSolution relocate_swap_g_solution = relocate_swap_g.get_solution();
 
-    // std::cout << "Relocate (Swap (Greedy)) solution cost: " << relocate_swap_g_solution.cost() << std::endl;
-    // std::cout << "Relocate (Swap (Greedy)) solution time: " << relocate_swap_g_solution.time() << std::endl;
+    std::cout << "Relocate (Swap (Greedy)) solution cost: " << relocate_swap_g_solution.cost() << std::endl;
+    std::cout << "Relocate (Swap (Greedy)) solution time: " << relocate_swap_g_solution.time() << std::endl;
 
     // --------------------------------  SWAP RELOCATE GREEDY LOCAL SOLUTION ---------------------------------------------------------------
 
-    // Swap swap_relocate_g(instance);
+    Swap swap_relocate_g(instance);
 
-    // swap_relocate_g.solve(relocate_greedy_solution.copy());
+    swap_relocate_g.solve(relocate_greedy_solution.copy());
 
-    // GapSolution swap_relocate_g_solution = swap_relocate_g.get_solution();
+    GapSolution swap_relocate_g_solution = swap_relocate_g.get_solution();
 
-    // std::cout << "Swap (Relocate (Greedy)) solution cost: " << swap_relocate_g_solution.cost() << std::endl;
-    // std::cout << "Swap (Relocate (Greedy)) solution time: " << swap_relocate_g_solution.time() << std::endl;
+    std::cout << "Swap (Relocate (Greedy)) solution cost: " << swap_relocate_g_solution.cost() << std::endl;
+    std::cout << "Swap (Relocate (Greedy)) solution time: " << swap_relocate_g_solution.time() << std::endl;
 
     // -------- ------------------------  RELOCATE SWAP RELOCATE SWAP GREEDY LOCAL SOLUTION ------------------------------------------------------
 
-    // Relocate relocate_swap_relocate_swap_g(instance);
+    Relocate relocate_swap_relocate_swap_g(instance);
 
-    // relocate_swap_relocate_swap_g.solve(swap_relocate_g_solution.copy());
+    relocate_swap_relocate_swap_g.solve(swap_relocate_g_solution.copy());
 
-    // GapSolution relocate_swap_relocate_swap_g_solution = relocate_swap_relocate_swap_g.get_solution();
+    GapSolution relocate_swap_relocate_swap_g_solution = relocate_swap_relocate_swap_g.get_solution();
 
-    // std::cout << "Relocate (Swap (Relocate (Swap))) solution cost: " << relocate_swap_relocate_swap_g_solution.cost() << std::endl;
-    // std::cout << "Relocate (Swap (Relocate (Swap))) solution time: " << relocate_swap_relocate_swap_g_solution.time() << std::endl;
-
+    std::cout << "Relocate (Swap (Relocate (Swap))) solution cost: " << relocate_swap_relocate_swap_g_solution.cost() << std::endl;
+    std::cout << "Relocate (Swap (Relocate (Swap))) solution time: " << relocate_swap_relocate_swap_g_solution.time() << std::endl;
 
     // --------------------------------  META ---------------------------------------------------------------
 
@@ -292,12 +293,12 @@ void tester(){
 }
 
 int main(int argc, char** argv) {
-
+    
+    // Aca empieza la magia 🪄
+    
     results_to_csv();
 
     // tester();
-
-    // routine();
 
     return 0;
 }

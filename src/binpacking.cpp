@@ -21,8 +21,6 @@ void BinPacking::solve(){
     for (int j = 0; j < this->_instance.n(); j++) {
         int deposito = this->get_mejor_deposito(j);
         
-        // std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
-
         this->_solution.asignar_deposito_a_vendedor(deposito, j);
         
     }

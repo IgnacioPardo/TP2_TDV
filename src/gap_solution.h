@@ -48,6 +48,9 @@ class GapSolution {
         // Set costo total de la solución
         void set_cost(double cost);
 
+        // Seteo instancia
+        void set_instance(GapInstance instance);
+
         // Set cantidad de vendedores
         void set_n(int n);
 

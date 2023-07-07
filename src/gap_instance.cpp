@@ -34,7 +34,7 @@ double GapInstance::demanda(int i, int j) const{
 double GapInstance::cost(int i, int j) const{
     // Costo de asignar el vendedor j al depósito i
     if (i == -1){
-        double max_cost = 0;
+        double max_cost = this->_cost[0][j];
         for (int k = 0; k < this->_m; k++){
             max_cost = std::max(max_cost, this->_cost[k][j]);
         }
@@ -70,10 +70,9 @@ void GapInstance::_read(std::string filename){
     this->_d = std::vector<std::vector<double>>(this->_m, std::vector<double>(this->_n, 0));
     this->_c = std::vector<double>(this->_m, 0);
 
-    // Fill _cost matrix
-    // The matrix is _m x _n
-    // The data is not in the same order as the matrix
-    // While reading the file, we will fill the matrix item by item
+    // Matriz de _cost
+    // _m x _n
+    // Se lee uno por uno y se va llenando la matriz
 
     int cant = this->_n * this->_m;
     int i = 0;
@@ -87,7 +86,7 @@ void GapInstance::_read(std::string filename){
         }
     }    
 
-    // Fill _d matrix
+    // Matriz _d
 
     i = 0;
     j = 0;
@@ -100,7 +99,7 @@ void GapInstance::_read(std::string filename){
         }
     }
 
-    // Fill _c vector
+    // Vector _c
 
     for (int i = 0; i < this->_c.size(); i++) {
         input_file >> this->_c[i];

@@ -19,7 +19,7 @@ void GreedyRandomized::solve() {
 
     this->_status = 1;
 
-    // Random order
+    // Ordenar los vendedores de manera aleatoria
 
     std::vector<int> vendedores(this->_instance.n());
     std::iota(vendedores.begin(), vendedores.end(), 0);
@@ -31,7 +31,6 @@ void GreedyRandomized::solve() {
     {
         int deposito = this->get_mejor_deposito(j);
 
-        // std::cout << "vendedor " << j << " deposito " << deposito << std::endl;
         if (deposito != -1)
         {
             this->_solution.asignar_deposito_a_vendedor(deposito, j);

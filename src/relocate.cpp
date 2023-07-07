@@ -41,42 +41,44 @@ void Relocate::local_search(){
     while (this->_solution.cost() < prev_cost || prev_cost == 0)
     {
         
-        // std::vector<std::tuple<GapSolution, int>> neighbours_w_cost = std::vector<std::tuple<GapSolution, int>>();
-
         std::vector<std::tuple<int, int, int>> relocation_w_cost = std::vector<std::tuple<int, int, int>>();
 
+        // Genero todos los vecinos
         // O(n*m)
         for (int v = 0; v < this->_solution.n(); v++){
             for (int d = 0; d < this->_solution.m(); d++){
 
+                // Solución actual
                 if (this->_solution.deposito_asignado_al_vendedor(v) == d)
                     continue;
 
+                // Evaluar la factibilidad de la solución y su costo
                 std::tuple<bool, double> relocation = this->single_relocation(v, d);
 
+                // Si la solución es factible
                 if (std::get<0>(relocation))
                 {
+                    // Si la solución es mejor que la actual
                     if (std::get<1>(relocation) < this->_solution.cost()){
-                        // std::cout << "Cost: " << this->_solution.cost() << " -> " << std::get<1>(relocation) << std::endl;
+                        // Agrego la solución a la lista de vecinos
                         relocation_w_cost.push_back(std::make_tuple(v, d, std::get<1>(relocation)));
                     }
                 }
             }
         }
 
+        // Si hay vecinos
         if (relocation_w_cost.size() > 0)
         {
+            // Ordeno los vecinos por costo
             std::sort(relocation_w_cost.begin(), relocation_w_cost.end(), [](std::tuple<int, int, int> a, std::tuple<int, int, int> b) {
                 return std::get<2>(a) < std::get<2>(b);
             });
 
-            // Cantidad de vecinos
-
-            //std::cout << "# Neighbours: " << relocation_w_cost.size() << std::endl;
-
+            // Registro el costo de la solución actual
             prev_cost = this->_solution.cost();
-
             
+            // Elijo el mejor vecino
             std::tuple<int, int, int> best_relocation = relocation_w_cost[0];
 
             int v = std::get<0>(best_relocation);
@@ -84,27 +86,15 @@ void Relocate::local_search(){
 
             double best_cost = std::get<2>(best_relocation);
 
-            //std::cout << "Relocating " << v << " to " << d << " with cost " << best_cost << std::endl;
 
             int prev_d = this->_solution.deposito_asignado_al_vendedor(v);
-
-            //std::cout << "Relocating " << v << " from prev d: " << prev_d << " new d: " << d << std::endl;
-            //std::cout << "with costs: " << this->_instance.cost(prev_d, v) << " -> " << this->_instance.cost(d, v) << std::endl;
-
-
-            //std::cout << "Desasignando deposito " << prev_d << " de vendedor " << v << std::endl;
 
             if (prev_d != -1)
                 this->_solution.desasignar_deposito_de_vendedor(prev_d, v);
 
-            //std::cout << "Asignando deposito " << d << " a vendedor " << v << std::endl;
             this->_solution.asignar_deposito_a_vendedor(d, v);
 
-            //std::cout << std::endl;
-            //std::cout << "prev cost: " << prev_cost << std::endl;
-            //std::cout << "Cost: " << this->_solution.cost() << " -> " << best_cost << std::endl;
-            this->_solution.recalc_cost();
-            //std::cout << "Recalculated cost: " << this->_solution.cost() << std::endl;
+            this->_solution.recalc_cost(); // Es O(n*m), pero nos pareció necesario para mantener la consistencia de la solución
         }
         else
         {
@@ -124,7 +114,6 @@ std::tuple<bool, double> Relocate::single_relocation(int v, int d){
     {
 
         double new_cost = this->_solution.cost() - this->_instance.cost(this->_solution.deposito_asignado_al_vendedor(v), v) + this->_instance.cost(d, v);
-
         return std::make_tuple(true, new_cost);
     }
     return std::make_tuple(false, 0);
