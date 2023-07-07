@@ -39,7 +39,7 @@ void Tabu::solve() {
     std::random_device rd;
     std::mt19937 gen(rd());
 
-    // Optamos por inicializar la solucion con BinPacking y no con Greedy por la experimentación resuelta.
+    // Optamos por inicializar la solucion con BinPacking y no con Greedy por la experimentación llevada a cabo.
     // GreedyMinCost greedy = GreedyMinCost(this->_instance);
     // std::cout << "Greedy Solve" << std::endl;
     // greedy.solve();
@@ -114,9 +114,10 @@ void Tabu::solve() {
             if (tabu_neighbours.size() == 0) {
                 break;
             }
-            std::sort(tabu_neighbours.begin(), tabu_neighbours.end(), [](const std::tuple<int, int, int, int, double> &a, const std::tuple<int, int, int, int, double> &b) {
-                return std::get<4>(a) < std::get<4>(b);
-            });
+            
+            // std::sort(tabu_neighbours.begin(), tabu_neighbours.end(), [](const std::tuple<int, int, int, int, double> &a, const std::tuple<int, int, int, int, double> &b) {
+            //     return std::get<4>(a) < std::get<4>(b);
+            // });
 
             std::tuple<int, int, int, int, double> best_swap = tabu_neighbours[0];
 
@@ -133,7 +134,6 @@ void Tabu::solve() {
             int d2 = std::get<3>(best_swap);
 
             swap.do_swap(v1, v2, d1, d2);
-            swap.get_solution().recalc_cost();
 
             // Efectuar el swap en la lista tabu
 

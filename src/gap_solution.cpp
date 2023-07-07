@@ -25,6 +25,8 @@ GapSolution::GapSolution(GapInstance instance) {
     this->_vendedores_asignados_a_deposito = std::vector<std::set<int>>(this->_m);
     this->_capacidad_usada_deposito = std::vector<int>(this->_m, 0);
     
+    // O(n)
+    // Asigna el costo como la suma de las penalizaciones
     this->recalc_cost();
 }
 
@@ -43,6 +45,8 @@ void GapSolution::set_instance(GapInstance instance) {
     this->_vendedores_asignados_a_deposito = std::vector<std::set<int>>(this->_m);
     this->_capacidad_usada_deposito = std::vector<int>(this->_m, 0);
 
+    // O(n)
+    // Asigna el costo como la suma de las penalizaciones
     this->recalc_cost();
 }
 

@@ -169,9 +169,9 @@ void tester(){
 
     // std::string filename = "instances/gap/gap_a/a05100";
     // std::string filename = "instances/gap/gap_b/b10200";
-    std::string filename = "instances/gap/gap_b/b05100";
+    // std::string filename = "instances/gap/gap_b/b05100";
     // std::string filename = "instances/gap/gap_e/e801600";
-    // std::string filename = "instances/real/real_instance";
+    std::string filename = "instances/real/real_instance";
 
     std::cout << "Reading file " << filename << std::endl;
 
@@ -322,11 +322,9 @@ int main(int argc, char** argv) {
     
     // Aca empieza la magia 🪄
     
-    // results_to_csv();
+    results_to_csv();
 
     // tester();
-
-    // other_Tabuheuristic();
 
     return 0;
 }

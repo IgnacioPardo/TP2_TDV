@@ -2,7 +2,9 @@
 #include "greedy_mincost.h"
 #include "binpacking.h"
 #include "swap.h"
+
 #include <random>
+#include <numeric>
 
 Relocate::~Relocate() {}
 
@@ -30,7 +32,21 @@ void Relocate::solve(GapSolution solution){
 }
 
 std::vector<std::tuple<int, int, double>> Relocate::neighbourhood(){
+    /*
+    *   Genera los vecinos de la solución actual
+    *   Los vecinos son todas aquellas soluciones que puedo obtener de reubicar un vendedor en otro depósito.
+    *   Reservo el primer lugar del vector para guardar la mejor solución encontrada.
+    *   Devuelve un vector de tuplas de la forma (v, d, costo)
+    *   Si no hay vecinos factibles, devuelve un vector de tuplas vacío.
+    */
+
+    double min_cost = std::numeric_limits<double>::max();
     std::vector<std::tuple<int, int, double>> relocation_w_cost = std::vector<std::tuple<int, int, double>>();
+
+    // Agrego un falso vecino inicial como espacio para guardar la mejor solución
+    // Me evita tener que ordenar el vecindario
+    relocation_w_cost.push_back(std::make_tuple(-1, -1, min_cost));
+    // Si no se generan vecinos factibles, devuelvo un vector vacío
 
     // Genero todos los vecinos
     // O(n*m)
@@ -54,10 +70,19 @@ std::vector<std::tuple<int, int, double>> Relocate::neighbourhood(){
                 {
                     // Agrego la solución a la lista de vecinos
                     relocation_w_cost.push_back(std::make_tuple(v, d, std::get<1>(relocation)));
+
+                    if (std::get<1>(relocation) < min_cost)
+                    {
+                        min_cost = std::get<1>(relocation);
+                        relocation_w_cost[0] = std::make_tuple(v, d, min_cost);
+                    }
                 }
             }
         }
     }
+
+    if (relocation_w_cost.size() == 1)
+        return std::vector<std::tuple<int, int, double>>();
 
     return relocation_w_cost;
 }
@@ -80,9 +105,9 @@ void Relocate::local_search(){
         if (neighbours.size() > 0)
         {
             // Ordeno los vecinos por costo
-            std::sort(neighbours.begin(), neighbours.end(), [](std::tuple<int, int, int> a, std::tuple<int, int, int> b) {
-                return std::get<2>(a) < std::get<2>(b);
-            });
+            // std::sort(neighbours.begin(), neighbours.end(), [](std::tuple<int, int, int> a, std::tuple<int, int, int> b) {
+            //     return std::get<2>(a) < std::get<2>(b);
+            // });
 
             // Registro el costo de la solución actual
             prev_cost = this->_solution.cost();
@@ -102,6 +127,8 @@ void Relocate::local_search(){
         }
         else
         {
+            // No hay vecinos que mejoren la solución actual
+            // Termina la búsqueda local
             break;
         }
         

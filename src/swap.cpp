@@ -1,5 +1,7 @@
 #include "swap.h"
+
 #include <iostream>
+#include <numeric>
 
 Swap::~Swap() {}
 
@@ -28,11 +30,20 @@ std::vector<std::tuple<int, int, int, int, double>> Swap::neighbourhood(){
     /*
     *   Genera los vecinos de la solución actual
     *   Los vecinos son todas aquellas soluciones que puedo obtener de intercambiar los depósitos asignados entre dos vendedores.
+    *   Reservo el primer lugar del vector para guardar la mejor solución encontrada.
+    *   Devuelve un vector de tuplas de la forma (v1, v2, d1, d2, costo)
+    *   Si no hay vecinos factibles, devuelve un vector de tuplas vacío.
     */
 
+    double min_cost = std::numeric_limits<double>::max();
     std::vector<std::tuple<int, int, int, int, double>> swaps_w_cost = std::vector<std::tuple<int, int, int, int, double>>();
 
-    // O(n * (n^2 - n) / 2)
+    // Agrego un falso vecino inicial como espacio para guardar la mejor solución
+    // Me evita tener que ordenar el vecindario
+    swaps_w_cost.push_back(std::make_tuple(-1, -1, -1, -1, min_cost));
+    // Si no se generan vecinos factibles, devuelvo un vector vacío
+
+    // O((n^2 - n) / 2)
     for (int v1 = 0; v1 < this->_instance.n(); v1++)
     {
         for (int v2 = v1 + 1; v2 < this->_instance.n(); v2++)
@@ -56,12 +67,22 @@ std::vector<std::tuple<int, int, int, int, double>> Swap::neighbourhood(){
             {
                 if (std::get<1>(posible_swap) < this->_solution.cost())
                 {
-                    // std::cout << "Swap: " << v1 << " " << v2 << " " << d1 << " " << d2 << " " << std::get<1>(posible_swap) << std::endl;
+                    // O(1)
                     swaps_w_cost.push_back(std::make_tuple(v1, v2, d1, d2, std::get<1>(posible_swap)));
+
+                    if (std::get<1>(posible_swap) < min_cost)
+                    {
+                        min_cost = std::get<1>(posible_swap);
+                        swaps_w_cost[0] = std::make_tuple(v1, v2, d1, d2, min_cost);
+                    }
                 }
             }
         }
     }
+
+    // O(1)
+    if (swaps_w_cost.size() == 1)
+        return std::vector<std::tuple<int, int, int, int, double>>();
 
     return swaps_w_cost;
 }
@@ -78,15 +99,16 @@ void Swap::local_search(){
     // Best Improvement
     while (this->_solution.cost() < prev_cost || prev_cost == 0){
         
+        // O((n^2 - n) / 2)
         std::vector<std::tuple<int, int, int, int, double>> neighbours = this->neighbourhood();
         
         if (neighbours.size() > 0)
         {   
 
             // Ordeno los vecinos por costo
-            std::sort(neighbours.begin(), neighbours.end(), [](std::tuple<int, int, int, int, double> a, std::tuple<int, int, int, int, double> b) {
-                return std::get<4>(a) < std::get<4>(b);
-            });
+            //std::sort(neighbours.begin(), neighbours.end(), [](std::tuple<int, int, int, int, double> a, std::tuple<int, int, int, int, double> b) {
+            //    return std::get<4>(a) < std::get<4>(b);
+            //});
 
 
             prev_cost = this->_solution.cost();
@@ -106,6 +128,8 @@ void Swap::local_search(){
         }
         else
         {
+            // No hay vecinos que mejoren la solución actual
+            // Termina la búsqueda local
             break;
         }
     }
@@ -140,13 +164,14 @@ std::tuple<bool, double> Swap::single_swap(int v1, int v2, int d1, int d2){
     /*
     *   Realiza el intercambio de depósitos entre dos vendedores sin modificar la solución actual.
     *   Devuelve un booleano indicando si el intercambio es posible y el costo de la solución resultante.
+    *   Complejidad: O(1)
     */
     
     if (this->_solution.deposito_asignado_al_vendedor(v1) == -1){ // O(1)
-        return this->swap_over_unasigned(v2, v1, d2);
+        return this->swap_over_unasigned(v2, v1, d2); // O(1)
     }
     else if (this->_solution.deposito_asignado_al_vendedor(v2) == -1){ // O(1)
-        return this->swap_over_unasigned(v1, v2, d1);
+        return this->swap_over_unasigned(v1, v2, d1); // O(1)
     }
 
     // O(1)
@@ -164,6 +189,7 @@ std::tuple<bool, double> Swap::swap_over_unasigned(int va, int vu, int da){
     /*
     *   Realiza el intercambio de depósitos entre un vendedor asignado y uno no asignado sin modificar la solución actual.
     *   Devuelve un booleano indicando si el intercambio es posible y el costo de la solución resultante.
+    *   Complejidad: O(1)
     */
 
     if (this->get_capacidad_deposito(da) + this->_instance.demanda(da, va) > this->_instance.demanda(da, vu))

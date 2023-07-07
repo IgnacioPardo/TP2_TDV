@@ -32,13 +32,12 @@ void RVND::solve(){
     int its = 10;
 
     for (int i = 0; i < 1; i++){
-        // std::cout << "Iteration: " << i << " Best cost: " << best_cost << std::endl;
 
-        // std::cout << i << " " << its << " " << (its/2) << " " << (i % (its/2)) << std::endl;
         if (i % (its/2) == 0){
-            if (i % (its) == 0){
-                // std::cout << "BinPackingRandomized cost: ";
+            // Reiniciar solucion
 
+            if (i % (its) == 0){
+                // La mitad de las veces, se inicializa con BinPackingRandomized
                 BinPackingRandomized binpacking_randomized(this->_instance);
 
                 binpacking_randomized.solve();
@@ -47,36 +46,33 @@ void RVND::solve(){
 
                 if (sol.cost() < best_cost || best_cost == 0){
                     best_cost = sol.cost();
-                    best_sol = sol.copy();
+                    best_sol = sol;
                 }
-                // std::cout << sol.cost() << std::endl;
             }
             else{
-                // std::cout << "GreedyMinCost cost: ";
+                // La otra mitad de las veces, se inicializa con GreedyMinCost
                 GreedyMinCost greedy(this->_instance);
                 greedy.solve();
                 sol = greedy.get_solution();
                 if (sol.cost() < best_cost){
                     best_cost = sol.cost();
-                    best_sol = sol.copy();
+                    best_sol = sol;
                 }
-                // std::cout << sol.cost() << std::endl;
             }
         }
         else if (i % (its/2) != 0){
-            // std::cout << "Random Destroyer cost: ";
+            // Destruir solucion si no se reinicia
             RandomDestroyer random_destroyer(this->_instance);
             random_destroyer.set_is_unassigner(true);
             random_destroyer.solve(sol);
             sol = random_destroyer.get_solution();
-            // std::cout << sol.cost() << std::endl;
         }
 
         double prev_cost = 0;
         int v = 0;
+        // Mientras se mejore la solucion
         while(sol.cost() < prev_cost || prev_cost == 0){
 
-            // std::cout << "Iteration: " << v++ << std::endl;
             prev_cost = sol.cost();
 
             Swap swap(this->_instance);
@@ -88,11 +84,14 @@ void RVND::solve(){
             }
 
             // ordenar por costo
-            std::sort(swap_neighborhood.begin(), swap_neighborhood.end(), [](std::tuple<int, int, int, int, double> a, std::tuple<int, int, int, int, double> b) { return std::get<4>(a) < std::get<4>(b); });
+            // std::sort(swap_neighborhood.begin(), swap_neighborhood.end(), [](std::tuple<int, int, int, int, double> a, std::tuple<int, int, int, int, double> b) { return std::get<4>(a) < std::get<4>(b); });
+            
             swap.do_swap(std::get<0>(swap_neighborhood[0]), std::get<1>(swap_neighborhood[0]), std::get<2>(swap_neighborhood[0]), std::get<3>(swap_neighborhood[0]));
             sol = swap.get_solution();
+            
             Relocate relocate(this->_instance);
             relocate.set_solution(sol);
+            
             std::vector<std::tuple<int, int, double>> relocate_neighborhood = relocate.neighbourhood();
 
             if (relocate_neighborhood.size() == 0){
@@ -100,17 +99,17 @@ void RVND::solve(){
             }
 
             // ordenar por costo
-            std::sort(relocate_neighborhood.begin(), relocate_neighborhood.end(), [](std::tuple<int, int, double> a, std::tuple<int, int, double> b) { return std::get<2>(a) < std::get<2>(b); });
+            // std::sort(relocate_neighborhood.begin(), relocate_neighborhood.end(), [](std::tuple<int, int, double> a, std::tuple<int, int, double> b) { return std::get<2>(a) < std::get<2>(b); });
+            
             relocate.do_relocation(std::get<0>(relocate_neighborhood[0]), std::get<1>(relocate_neighborhood[0]));
             sol = relocate.get_solution();
 
             if (sol.cost() < best_cost){
                 best_cost = sol.cost();
-                best_sol = sol.copy();
+                best_sol = sol;
             }
             v++;
         }
-        // std::cout << "Found cost: " << sol.cost() << std::endl;
     }
 
     this->_solution = best_sol;
