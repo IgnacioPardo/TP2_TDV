@@ -45,9 +45,8 @@ double GapInstance::cost(int i, int j) const{
 
 double GapInstance::penalizacion(int j) const{
     // Penalización del vendedor j
-
-    double max_cost = 0;
-    for (int k = 0; k < this->_m; k++){
+    double max_cost = this->_cost[0][j];
+    for (int k = 1; k < this->_m; k++){
         max_cost = std::max(max_cost, this->_cost[k][j]);
     }
     return 3 * max_cost;

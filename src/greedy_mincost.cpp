@@ -35,7 +35,7 @@ int GreedyMinCost::get_mejor_deposito(int j) {
     *   Devuelve el deposito que tenga menor costo y que cumpla con la demanda del vendedor j.
     *   Si no hay deposito que cumpla con la demanda del vendedor j, devuelve -1.
     */
-   
+
     int mejor_deposito = -1;
     int mejor_costo = -1;
 

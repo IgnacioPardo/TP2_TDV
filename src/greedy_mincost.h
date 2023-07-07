@@ -11,11 +11,10 @@ class GreedyMinCost : public Solver {
         using Solver::Solver;   
         ~GreedyMinCost();
 
-        void solve();
-
+        virtual void solve();
         virtual std::string get_name() const override;
     
-    private:
+    protected:
         int get_mejor_deposito(int j);
 };
 

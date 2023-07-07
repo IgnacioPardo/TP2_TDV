@@ -293,9 +293,9 @@ void tester(){
 
 int main(int argc, char** argv) {
 
-    // results_to_csv();
+    results_to_csv();
 
-    tester();
+    // tester();
 
     // routine();
 

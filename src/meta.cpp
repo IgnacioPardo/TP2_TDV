@@ -8,6 +8,8 @@
 
 #include "random_destroyer.h"
 #include "greedy_mincost.h"
+#include "greedy_randomized.h"
+#include "binpacking_randomized.h"
 #include "relocate.h"
 #include "swap.h"
 
@@ -22,36 +24,84 @@ void Meta::solve() {
     *  Tabú Swap with Random Destruction
     */
 
+    int iter_count = 10;
+    int max_tries = 10;
+    int cutoff = 30;
+    int neighbourhood_count = 10;
+
     std::vector<GapSolution> solutions = std::vector<GapSolution>();
 
     //start timer
-    auto start = std::chrono::high_resolution_clock::now();
 
-    int max_iter = 1000;
+    auto start = std::chrono::high_resolution_clock::now();
     std::random_device rd;
     std::mt19937 gen(rd());
 
     // std::cout << "Greedy init" << std::endl;
 
-    GreedyMinCost greedy = GreedyMinCost(this->_instance);
+    // GreedyMinCost greedy = GreedyMinCost(this->_instance);
     // std::cout << "Greedy Solve" << std::endl;
-    greedy.solve();
-    this->_solution = greedy.get_solution();
+    // greedy.solve();
+    // this->_solution = greedy.get_solution();
+
+
+    BinPacking bin_packing = BinPacking(this->_instance);
+    bin_packing.solve();
+    this->_solution = bin_packing.get_solution();
+
+    std::cout << "BinPacking Init Cost: " << this->_solution.cost() << std::endl;
+    
     // std::cout << "Greedy Solved" << std::endl;
 
     // std::cout << "Touring" << std::endl;
 
     int last_neighbourhood_size = 0;
 
-    for (int i = 0; i < max_iter; i++){
+    int tries = 0;
+
+    for (int i = 0; i < iter_count; i++){
+        
+        if (i > cutoff){
+            // If last 3 solutions are the worst than i-3, stop
+            bool stop = false;
+            for (int j = 0; j < 3; j++){
+                if (solutions[i - j].cost() < solutions[i - j - 1].cost()){
+                    tries += 1;
+                    stop = true;
+                }
+            }
+            if (stop){
+                
+                if (tries > max_tries){
+                    break;
+                }
+                else{
+                    std::cout << "Restarting try " << tries << std::endl;
+                    
+                    // Alternate between greedy and binpacking
+
+                    if (tries % 2 == 0){    
+                        GreedyRandomized greedy_randomized = GreedyRandomized(this->_instance);
+                        greedy_randomized.solve();
+                        this->_solution = greedy_randomized.get_solution();
+                    }
+                    else{
+                        BinPackingRandomized bin_packing_randomized = BinPackingRandomized(this->_instance);
+                        bin_packing_randomized.solve();
+                        this->_solution = bin_packing_randomized.get_solution();
+                    }
+                }
+            }
+        }
 
         std::uniform_int_distribution<> destroy_dis(1, 10);
 
         // if (false){
-        if (destroy_dis(gen) <= 1) {
+        if (destroy_dis(gen) <= 3) {
         // if (last_neighbourhood_size < 1) {
             // std::cout << "Random Destroying" << std::endl;
             RandomDestroyer destroyer = RandomDestroyer(this->_instance);
+            
             // std::cout << "Solving" << std::endl;
             destroyer.solve(this->_solution);
             // std::cout << "Solved" << std::endl;
@@ -75,13 +125,13 @@ void Meta::solve() {
         swap.set_solution(this->_solution);
         // std::cout << "Exploring" << std::endl;
 
-        for (int j = 0; j < 1; j++) {
+        for (int j = 0; j < neighbourhood_count; j++) {
 
             std::vector<std::tuple<int, int, int, int, double>> tabu_neighbours = swap.neighbourhood();
 
             if (tabu_neighbours.size() == 0) {
                 // std::cout << "No neighbours" << std::endl;
-                continue;
+                break;
             }
             // std::cout << "Sorting" << std::endl;
             // sort tabu_neighbours by cost
@@ -102,8 +152,8 @@ void Meta::solve() {
             // if error is less than 40% of the best solution, continue
             if (std::get<4>(best_swap) - this->_solution.cost() > 0.4 * this->_solution.cost()) {
                 // std::cout << "Best Swap: " << std::get<4>(best_swap) << std::endl;
-                max_iter--;
-                continue;
+                //iter_count--;
+                break;
             }
 
             int v1 = std::get<0>(best_swap);
@@ -118,11 +168,11 @@ void Meta::solve() {
 
             // double best_cost = std::get<4>(best_swap);
 
-            std::cout << "Swapped! j: " << j << " cost: " << swap.get_solution().cost() << std::endl;
+            // std::cout << "Swapped! j: " << j << " cost: " << swap.get_solution().cost() << std::endl;
             // time elapsed
-            std::cout << "T: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << std::endl;
+            // std::cout << "T: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << std::endl;
         }
-        std::cout << "Meta! i: " << i << " cost: " << swap.get_solution().cost() << std::endl;
+        std::cout << "Meta i: " << i << " cost: " << swap.get_solution().cost() << std::endl;
         std::cout << "T: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << std::endl;
         
         this->_solution = swap.get_solution();
