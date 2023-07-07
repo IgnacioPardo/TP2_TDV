@@ -54,15 +54,14 @@ void Meta::solve() {
     for (int i = 0; i < iter_count; i++){
         
         if (i > cutoff){
-            // Si las ultimas 3 soluciones son peores que la anterior, se corta la ejecucion
-            bool stop = false;
+            // Si las ultimas 3 soluciones son peores o iguales que la anterior, se corta la ejecucion
+            int stop_count = 0;
             for (int j = 0; j < 3; j++){
-                if (solutions[i - j].cost() < solutions[i - j - 1].cost()){
-                    tries += 1;
-                    stop = true;
+                if (solutions[i - j].cost() >= solutions[i - j - 1].cost()){
+                    stop_count++;
                 }
             }
-            if (stop){
+            if (stop_count == 3){
                 
                 if (tries > max_tries){
                     break;
@@ -137,13 +136,9 @@ void Meta::solve() {
             // Efectuar el swap en la lista tabu
 
         }
-        std::cout << "Meta i: " << i << " cost: " << swap.get_solution().cost() << std::endl;
-        std::cout << "T: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << std::endl;
         
         this->_solution = swap.get_solution();
         this->_solution.recalc_cost();
-
-        // std::cout << "New Solution Cost: " << this->_solution.cost() << std::endl;
 
         solutions.push_back(this->_solution.copy());
     }
@@ -157,7 +152,7 @@ void Meta::solve() {
     // Tomar la mejor solucion
     this->_solution = solutions[0];
 
-
+    std::cout << "Best Solution: " << this->_solution.cost() << std::endl;
     //end timer
     auto end = std::chrono::high_resolution_clock::now();
     this->_solution_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();

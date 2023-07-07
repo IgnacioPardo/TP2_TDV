@@ -2,7 +2,7 @@
 title: "Logística centralizada de primera milla"
 subtitle: "Diseño de Algoritmos - Licenciatura en Tecnología Digital - UTDT"
 author:
-- Luca Mazzarello^[lmazzarello@mail.utdt.edu | ]
+- Luca Mazzarello^[lmazzarello@mail.utdt.edu | 44512364 | 21L720]
 - Ignacio Pardo^[ipardo@mail.utdt.edu | 43243336 | 21R1160]
 - Tadeo Yapoudjian^[tadeyapu@gmail.com | 44788317 | 21N719]
 date: "`r Sys.Date()`"
@@ -330,9 +330,9 @@ Finalmente, sobre la instancia real los resultados parecen ser bastante consiste
 
 Los costos de las soluciones obtenidas son:
 
-| D     |V        | G        | BP          | S(G)        | S(BP)         | R(G)       |R(BP)           |  S(R(G)) | S(R(BP)) | R(S(G)) | R(S(BP))  |   M   |
-|------:|--------:|---------:|------------:|------------:|--------------:|-----------:|---------------:|---------:|---------:|--------:|----------:|------:|
-|   310 |    1100 |    964.9 |       10629 |       824.2 |        1146.8 |      794.1 |          797.8 |    742.1 |    729.8 |   747.9 |     764.7 | 783.4 |
+| G        | BP          | S(G)        | S(BP)         | R(G)       |R(BP)           |  S(R(G)) | S(R(BP)) | R(S(G)) | R(S(BP))  |   M   |
+|---------:|------------------:|--------------------:|-------------------------:|------------------------:|-----------------------------:|-----------------------------:|----------------------------------:|-----------------------------:|----------------------------------:|------------:|
+|    964.9 |             10629 |               824.2 |                   1146.8 |                   794.1 |                        797.8 |                        742.1 |                             **729.8** |                        747.9 |                             764.7 |       768.3 |
 
 |![Costo sobre Instancia Real](src/output/figures/instancia_real_cost.png)|
 |:--:|
