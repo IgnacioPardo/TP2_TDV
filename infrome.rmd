@@ -362,13 +362,13 @@ Finalmente, sobre la instancia real los resultados parecen ser bastante consiste
 
 | G     | BP    | S(G)    | S(BP)  | R(G)   |R(BP)  | S(R(G)) | S(R(BP)) | R(S(G)) | R(S(BP)) | TABU  |   RVND    |
 |------:|------:|--------:|-------:|-------:|------:|--------:|---------:|--------:|---------:|------:|----------:|
-| 964.9 | 10629 |   824.2 | 1146.8 |  794.1 | 797.8 |   742.1 |  729.8   |   747.9 |    764.7 | 768.3 | **718.9** |
+| 964.9 | 10629 |   824.2 | 1146.8 |  794.1 | 797.8 |   742.1 |  729.8   |   747.9 |    764.7 | 768.3 | **717.8** |
 
 |![Costo sobre Instancia Real](src/output/figures/instancia_real_cost.png)|
 |:--:|
 |Costo sobre Instancia Real|
 
-La figura "Tiempo sobre Instancia Real" muestra la comparación de tiempos de ejecución de los algoritmos. Las metaheurística propuestas aunque no es super veloz, logra obtener una solución en un tiempo de ejecución similar al de los operadores de búsqueda local. En particular, la Tabú se ejecuta en menor tiempo que la encadenación Relocate(Swap(BinPacking)).
+La figura "Tiempo sobre Instancia Real" muestra la comparación de tiempos de ejecución de los algoritmos. Las metaheurística propuestas aunque no es super veloz, logra obtener una solución en un tiempo de ejecución similar al de los operadores de búsqueda local. En particular, la Tabú se ejecuta en menor tiempo que la encadenación Relocate(Swap(BinPacking)). Siendo RVND la más lenta de todas con la mejor solución.
 
 |![Tiempo sobre Instancia Real](src/output/figures/instancia_real_time.png)|
 |:--:|
