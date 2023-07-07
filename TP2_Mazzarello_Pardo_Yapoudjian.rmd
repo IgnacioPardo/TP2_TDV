@@ -1,5 +1,5 @@
 ---
-title: "Logística centralizada de primera milla"
+title: "Trabajo Práctico 2 - Logística centralizada de primera milla"
 subtitle: "Diseño de Algoritmos - Licenciatura en Tecnología Digital - UTDT"
 author:
 - Luca Mazzarello^[lmazzarello@mail.utdt.edu | 44512364 | 21L720]
